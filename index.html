@@ -2943,16 +2943,20 @@ function openEmployee(fio){
         if (dayNormMin!==null){
           var worked = dm - am;
           totalWorkedMin += worked; totalNormMin += dayNormMin; workedDaysCount++;
-          var diff;
-          if (st === 'early'){
-            diff = -(d.early_min||0);  // faqat erta ketish miqdori (chiqish vaqtidan)
-          } else if (st === 'late'){
-            diff = -(d.late_min||0);   // faqat kech qolish miqdori (kirish vaqtidan)
-          } else {
-            diff = worked - dayNormMin;  // umumiy ish vaqti normadan farqi (masalan sverxurochniy)
+
+          // Kirish farqi: musbat = erta keldi, manfiy = kech qoldi
+          var arrDiff = (dss!==null) ? (dss - am) : null;
+          // Chiqish farqi: musbat = ortiqcha (sverxurochniy) ishladi, manfiy = erta ketdi
+          var depDiff = (dse!==null) ? (dm - dse) : null;
+
+          if (arrDiff!==null && Math.abs(arrDiff) > 2){
+            var arrColor = arrDiff < -10 ? 'var(--red)' : (arrDiff > 10 ? 'var(--green)' : 'var(--muted)');
+            timesHTML += '<div class="times" style="color:'+arrColor+';font-weight:700;white-space:nowrap;" title="Kirish - grafikdan farqi">\u2193 '+fmtMinDiff(arrDiff)+'</div>';
           }
-          var diffColor = diff < -10 ? 'var(--red)' : (diff > 10 ? 'var(--green)' : 'var(--muted)');
-          timesHTML += '<div class="times" style="color:'+diffColor+';font-weight:700;white-space:nowrap;" title="Normadan farq (shu kunning o\u02bbz grafigi bo\u02bbyicha)">'+fmtMinDiff(diff)+'</div>';
+          if (depDiff!==null && Math.abs(depDiff) > 2){
+            var depColor = depDiff < -10 ? 'var(--red)' : (depDiff > 10 ? 'var(--green)' : 'var(--muted)');
+            timesHTML += '<div class="times" style="color:'+depColor+';font-weight:700;white-space:nowrap;" title="Chiqish - grafikdan farqi (musbat = sverxurochniy)">\u2191 '+fmtMinDiff(depDiff)+'</div>';
+          }
         }
       }
     }
