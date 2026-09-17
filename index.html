@@ -2334,7 +2334,7 @@ function renderTekuchka(){
     '<div class="stat-card c-ongoing"><div class="num">'+fmtTenure(st.avg_tenure_days_dismissed)+'</div><div class="lbl">Ketganlarning oʻrtacha staji</div></div>';
 
   // ---- oylik trend: divergent ustunlar - qabul (yashil) yuqoriga, bo'shash (qizil) pastga ----
-  var months = T.monthly;
+  var months = T.monthly.slice(-12);
   var maxVal = 1;
   months.forEach(function(m){ maxVal = Math.max(maxVal, m.hires, m.dismissals); });
   var half = 78; // nol chizig'idan yuqoriga/pastga maksimal balandlik (px)
