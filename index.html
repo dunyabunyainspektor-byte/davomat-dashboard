@@ -806,6 +806,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       <button class="analitika-group-btn" data-agroup="xodimlar">👤 Xodimlar reytingi</button>
       <button class="analitika-group-btn" data-agroup="guruh">🏢 Guruh taqqoslash</button>
       <button class="analitika-group-btn" data-agroup="demografiya">👥 Demografiya va moliya</button>
+      <button class="analitika-group-btn" data-agroup="tekuchka">🔄 Tekuchka</button>
     </div>
 
     <!-- GURUH A: VAQT BUZILISHLARI -->
@@ -954,6 +955,43 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <div class="sub" style="color:var(--muted);font-size:12.5px;margin-bottom:12px;">Jarima sababli qancha pul ushlab qolingani va bu bonus fondining necha foizini tashkil qilishi</div>
         <div class="stats-row" id="financialStats" style="margin-bottom:16px;"></div>
         <div id="financialByFilial"></div>
+      </div>
+    </div>
+
+    <!-- GURUH E: TEKUCHKA -->
+    <div class="agroup" id="agroup-tekuchka" style="display:none;">
+      <div id="tekuchkaEmpty" style="display:none;" class="panel">
+        <div class="sub" style="color:var(--muted);font-size:13px;">Tekuchka ma'lumoti hali mavjud emas - buning uchun davomat_yangilash.py skriptining eng so'nggi versiyasi bilan dashboard qayta yangilanishi kerak.</div>
+      </div>
+      <div id="tekuchkaContent">
+        <div class="stats-row" id="tekuchkaStats" style="margin-bottom:16px;"></div>
+        <div class="panel" style="margin-bottom:16px;">
+          <h3>📊 Qabul va bo'shash dinamikasi (oxirgi 12 oy)</h3>
+          <div class="sub" style="color:var(--muted);font-size:12.5px;margin-bottom:12px;">Har bir oyda nechta xodim ishga qabul qilingani va nechta xodim ishdan bo'shaganini solishtiring</div>
+          <div id="tekuchkaTrend"></div>
+        </div>
+        <div class="grid-2" style="grid-template-columns:1fr 1fr;">
+          <div class="panel">
+            <h3>🏢 Bo'lim bo'yicha tekuchka</h3>
+            <div class="sub" style="color:var(--muted);font-size:11.5px;margin-bottom:10px;">Oxirgi 12 oyda eng ko'p xodim yo'qotgan bo'limlar</div>
+            <div id="tekuchkaByDivision"></div>
+          </div>
+          <div class="panel">
+            <h3>💼 Lavozim bo'yicha tekuchka</h3>
+            <div class="sub" style="color:var(--muted);font-size:11.5px;margin-bottom:10px;">Oxirgi 12 oyda eng ko'p xodim yo'qotgan lavozimlar</div>
+            <div id="tekuchkaByJob"></div>
+          </div>
+        </div>
+        <div class="panel" style="margin-top:16px;">
+          <h3>🚪 So'nggi ketgan xodimlar</h3>
+          <div class="sub" style="color:var(--muted);font-size:12.5px;margin-bottom:12px;">Eng so'nggi ishdan bo'shagan xodimlar, qancha muddat ishlagani bilan</div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead><tr><th>Xodim</th><th>Bo'lim</th><th>Lavozim</th><th>Ishga kirgan</th><th>Ketgan</th><th>Ish staji</th></tr></thead>
+              <tbody id="tekuchkaLeaversTbody"></tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -2260,6 +2298,90 @@ function renderFinancialImpact(){
     }).join('') + '</tbody></table>';
 }
 
+function fmtMonthLabel(ym){
+  var parts = ym.split('-');
+  var names = ['Yan','Fev','Mar','Apr','May','Iyn','Iyl','Avg','Sen','Okt','Noy','Dek'];
+  return names[parseInt(parts[1],10)-1] + " '" + parts[0].slice(2);
+}
+
+function fmtTenure(days){
+  if (days===null || days===undefined) return '—';
+  if (days < 30) return days + ' kun';
+  var months = Math.round(days/30.4);
+  if (months < 12) return months + ' oy';
+  var years = Math.floor(months/12), rem = months%12;
+  return years + ' yil' + (rem ? ' ' + rem + ' oy' : '');
+}
+
+function renderTekuchka(){
+  var emptyEl = document.getElementById('tekuchkaEmpty');
+  var contentEl = document.getElementById('tekuchkaContent');
+  var T = DATA.turnover;
+  if (!emptyEl || !contentEl) return;
+  if (!T){
+    emptyEl.style.display = '';
+    contentEl.style.display = 'none';
+    return;
+  }
+  emptyEl.style.display = 'none';
+  contentEl.style.display = '';
+
+  var st = T.stats;
+  document.getElementById('tekuchkaStats').innerHTML =
+    '<div class="stat-card c-total"><div class="num">'+st.active_count+'</div><div class="lbl">Joriy xodimlar soni</div></div>'+
+    '<div class="stat-card c-lateearly"><div class="num">'+st.dismissed_last12+'</div><div class="lbl">Oxirgi 12 oyda ketganlar</div></div>'+
+    '<div class="stat-card c-late"><div class="num">'+st.turnover_rate_last12.toFixed(1)+'%</div><div class="lbl">Tekuchka darajasi (yillik)</div></div>'+
+    '<div class="stat-card c-ongoing"><div class="num">'+fmtTenure(st.avg_tenure_days_dismissed)+'</div><div class="lbl">Ketganlarning oʻrtacha staji</div></div>';
+
+  // ---- oylik trend: qabul (yashil) vs bo'shash (qizil) ustunlari ----
+  var months = T.monthly;
+  var maxVal = 1;
+  months.forEach(function(m){ maxVal = Math.max(maxVal, m.hires, m.dismissals); });
+  var barsHtml = months.map(function(m){
+    var hH = Math.round((m.hires/maxVal)*130);
+    var dH = Math.round((m.dismissals/maxVal)*130);
+    return '<div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;">'+
+      '<div style="display:flex;gap:2px;align-items:flex-end;height:150px;">'+
+        '<div title="Qabul: '+m.hires+'" style="width:8px;height:'+Math.max(hH,m.hires>0?2:0)+'px;background:var(--green);border-radius:2px 2px 0 0;"></div>'+
+        '<div title="Boʻshadi: '+m.dismissals+'" style="width:8px;height:'+Math.max(dH,m.dismissals>0?2:0)+'px;background:var(--red);border-radius:2px 2px 0 0;"></div>'+
+      '</div>'+
+      '<div style="font-size:9px;font-weight:700;color:var(--muted);margin-top:6px;white-space:nowrap;transform:rotate(-40deg);transform-origin:top center;">'+fmtMonthLabel(m.month)+'</div>'+
+      '</div>';
+  }).join('');
+  var legendHtml = '<div style="display:flex;gap:16px;margin-top:26px;padding-top:12px;border-top:1px solid var(--line);font-size:11.5px;font-weight:700;">'+
+    '<span style="display:flex;align-items:center;gap:6px;color:var(--text);"><span style="width:10px;height:10px;border-radius:3px;background:var(--green);display:inline-block;"></span>Qabul qilingan</span>'+
+    '<span style="display:flex;align-items:center;gap:6px;color:var(--text);"><span style="width:10px;height:10px;border-radius:3px;background:var(--red);display:inline-block;"></span>Ishdan boʻshagan</span>'+
+    '<span style="margin-left:auto;color:var(--muted);">Joriy xodimlar soni: <b style="color:var(--text);">'+months[months.length-1].headcount_end+'</b></span>'+
+    '</div>';
+  document.getElementById('tekuchkaTrend').innerHTML =
+    '<div style="display:flex;gap:4px;align-items:flex-end;">'+barsHtml+'</div>' + legendHtml;
+
+  // ---- bo'lim / lavozim jadvallari ----
+  function renderGroupTable(rows, elId){
+    var el = document.getElementById(elId);
+    if (!el) return;
+    var top = rows.slice(0, 10);
+    if (!top.length){ el.innerHTML = '<div class="sub" style="color:var(--muted);">Maʻlumot yoʻq</div>'; return; }
+    el.innerHTML = '<table><thead><tr><th>Nomi</th><th>Faol</th><th>12 oyda ketgan</th><th>Tekuchka</th></tr></thead><tbody>'+
+      top.map(function(r){
+        var color = r.turnover_rate >= 60 ? 'var(--red)' : (r.turnover_rate >= 30 ? 'var(--amber)' : 'var(--green)');
+        return '<tr><td style="font-weight:700;">'+r.name+'</td><td>'+r.active+'</td>'+
+          '<td>'+r.dismissed_last12+'</td><td style="color:'+color+';font-weight:800;">'+r.turnover_rate.toFixed(0)+'%</td></tr>';
+      }).join('') + '</tbody></table>';
+  }
+  renderGroupTable(T.by_division, 'tekuchkaByDivision');
+  renderGroupTable(T.by_job, 'tekuchkaByJob');
+
+  // ---- so'nggi ketganlar ----
+  var tbody = document.getElementById('tekuchkaLeaversTbody');
+  if (tbody){
+    tbody.innerHTML = T.recent_leavers.map(function(r){
+      return '<tr><td style="font-weight:700;">'+r.name+'</td><td>'+r.division_name+'</td><td>'+r.job_name+'</td>'+
+        '<td>'+(r.hiring_date||'—')+'</td><td>'+(r.dismissal_date||'—')+'</td><td>'+fmtTenure(r.tenure_days)+'</td></tr>';
+    }).join('');
+  }
+}
+
 function renderWeekdayPattern(emp){
   var el = document.getElementById('weekdayPattern');
   if (!el) return;
@@ -2704,6 +2826,7 @@ function renderAnalitikaView(){
   renderConsistency();
   renderBestEmployees();
   renderFinancialImpact();
+  renderTekuchka();
 
   var q = (document.getElementById('analitikaSearch').value||'').toLowerCase();
   var rows = perEmp.filter(function(x){ return !q || x.e.fio.toLowerCase().indexOf(q)!==-1; });
