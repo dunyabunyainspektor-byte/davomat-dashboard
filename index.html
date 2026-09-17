@@ -2341,7 +2341,7 @@ function renderTekuchka(){
   var barsHtml = months.map(function(m){
     var hH = m.hires ? Math.max(Math.round((m.hires/maxVal)*half), 3) : 0;
     var dH = m.dismissals ? Math.max(Math.round((m.dismissals/maxVal)*half), 3) : 0;
-    var barStyle = 'width:60%;max-width:38px;min-width:18px;';
+    var barStyle = 'width:64%;max-width:72px;min-width:22px;';
     return '<div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;">'+
       '<div style="width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:'+half+'px;">'+
         (m.hires ? '<div style="font-size:9.5px;font-weight:800;color:var(--green);margin-bottom:3px;">'+m.hires+'</div>' : '')+
