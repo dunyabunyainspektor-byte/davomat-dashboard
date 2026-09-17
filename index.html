@@ -2333,28 +2333,33 @@ function renderTekuchka(){
     '<div class="stat-card c-late"><div class="num">'+st.turnover_rate_last12.toFixed(1)+'%</div><div class="lbl">Tekuchka darajasi (yillik)</div></div>'+
     '<div class="stat-card c-ongoing"><div class="num">'+fmtTenure(st.avg_tenure_days_dismissed)+'</div><div class="lbl">Ketganlarning oʻrtacha staji</div></div>';
 
-  // ---- oylik trend: qabul (yashil) vs bo'shash (qizil) ustunlari ----
+  // ---- oylik trend: divergent ustunlar - qabul (yashil) yuqoriga, bo'shash (qizil) pastga ----
   var months = T.monthly;
   var maxVal = 1;
   months.forEach(function(m){ maxVal = Math.max(maxVal, m.hires, m.dismissals); });
+  var half = 78; // nol chizig'idan yuqoriga/pastga maksimal balandlik (px)
   var barsHtml = months.map(function(m){
-    var hH = Math.round((m.hires/maxVal)*130);
-    var dH = Math.round((m.dismissals/maxVal)*130);
+    var hH = m.hires ? Math.max(Math.round((m.hires/maxVal)*half), 3) : 0;
+    var dH = m.dismissals ? Math.max(Math.round((m.dismissals/maxVal)*half), 3) : 0;
     return '<div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;">'+
-      '<div style="display:flex;gap:2px;align-items:flex-end;height:150px;">'+
-        '<div title="Qabul: '+m.hires+'" style="width:8px;height:'+Math.max(hH,m.hires>0?2:0)+'px;background:var(--green);border-radius:2px 2px 0 0;"></div>'+
-        '<div title="Boʻshadi: '+m.dismissals+'" style="width:8px;height:'+Math.max(dH,m.dismissals>0?2:0)+'px;background:var(--red);border-radius:2px 2px 0 0;"></div>'+
+      '<div style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:'+half+'px;">'+
+        (m.hires ? '<div style="font-size:9.5px;font-weight:800;color:var(--green);margin-bottom:3px;">'+m.hires+'</div>' : '')+
+        '<div title="Qabul: '+m.hires+'" style="width:14px;height:'+hH+'px;background:var(--green);border-radius:3px 3px 0 0;"></div>'+
       '</div>'+
-      '<div style="font-size:9px;font-weight:700;color:var(--muted);margin-top:6px;white-space:nowrap;transform:rotate(-40deg);transform-origin:top center;">'+fmtMonthLabel(m.month)+'</div>'+
+      '<div style="display:flex;flex-direction:column;align-items:center;justify-content:flex-start;height:'+half+'px;">'+
+        '<div title="Boʻshadi: '+m.dismissals+'" style="width:14px;height:'+dH+'px;background:var(--red);border-radius:0 0 3px 3px;"></div>'+
+        (m.dismissals ? '<div style="font-size:9.5px;font-weight:800;color:var(--red);margin-top:3px;">'+m.dismissals+'</div>' : '')+
+      '</div>'+
+      '<div style="font-size:9px;font-weight:700;color:var(--muted);margin-top:10px;white-space:nowrap;">'+fmtMonthLabel(m.month)+'</div>'+
       '</div>';
   }).join('');
-  var legendHtml = '<div style="display:flex;gap:16px;margin-top:26px;padding-top:12px;border-top:1px solid var(--line);font-size:11.5px;font-weight:700;">'+
+  var legendHtml = '<div style="display:flex;gap:16px;margin-top:16px;padding-top:12px;border-top:1px solid var(--line);font-size:11.5px;font-weight:700;">'+
     '<span style="display:flex;align-items:center;gap:6px;color:var(--text);"><span style="width:10px;height:10px;border-radius:3px;background:var(--green);display:inline-block;"></span>Qabul qilingan</span>'+
     '<span style="display:flex;align-items:center;gap:6px;color:var(--text);"><span style="width:10px;height:10px;border-radius:3px;background:var(--red);display:inline-block;"></span>Ishdan boʻshagan</span>'+
     '<span style="margin-left:auto;color:var(--muted);">Joriy xodimlar soni: <b style="color:var(--text);">'+months[months.length-1].headcount_end+'</b></span>'+
     '</div>';
   document.getElementById('tekuchkaTrend').innerHTML =
-    '<div style="display:flex;gap:4px;align-items:flex-end;">'+barsHtml+'</div>' + legendHtml;
+    '<div style="display:flex;gap:6px;align-items:flex-start;border-top:1px solid var(--line);position:relative;">'+barsHtml+'</div>' + legendHtml;
 
   // ---- bo'lim / lavozim jadvallari ----
   function renderGroupTable(rows, elId){
