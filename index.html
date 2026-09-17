@@ -2338,10 +2338,18 @@ function renderTekuchka(){
   var maxVal = 1;
   months.forEach(function(m){ maxVal = Math.max(maxVal, m.hires, m.dismissals); });
   var barMaxH = 150; // ustunning maksimal balandligi (px)
+  // Ustun kengligini konteynerning haqiqiy piksel kengligidan hisoblaymiz (foiz emas),
+  // chunki ota elementda aniq kenglik bo'lmagani uchun foizli kenglik ishlamas edi.
+  var trendWrapEl = document.getElementById('tekuchkaTrend');
+  var chartW = (trendWrapEl && (trendWrapEl.clientWidth || trendWrapEl.offsetWidth)) || 900;
+  var colGapPx = 6; // tashqi flex qatordagi gap bilan bir xil
+  var colW = Math.max(24, (chartW - colGapPx * (months.length - 1)) / months.length);
+  var barW = Math.round(colW * 0.30);
+  barW = Math.max(11, Math.min(barW, 44));
   var barsHtml = months.map(function(m){
     var hH = m.hires ? Math.max(Math.round((m.hires/maxVal)*barMaxH), 3) : 0;
     var dH = m.dismissals ? Math.max(Math.round((m.dismissals/maxVal)*barMaxH), 3) : 0;
-    var barStyle = 'width:38%;min-width:12px;';
+    var barStyle = 'width:'+barW+'px;';
     return '<div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;">'+
       '<div style="width:100%;display:flex;align-items:flex-end;justify-content:center;gap:4%;height:'+barMaxH+'px;">'+
         '<div style="display:flex;flex-direction:column;align-items:center;">'+
@@ -3507,7 +3515,11 @@ function init(){
   var trendResizeTimer = null;
   window.addEventListener('resize', function(){
     clearTimeout(trendResizeTimer);
-    trendResizeTimer = setTimeout(function(){ renderTrendChart(); }, 150);
+    trendResizeTimer = setTimeout(function(){
+      renderTrendChart();
+      var tekuchkaTrendEl = document.getElementById('tekuchkaTrend');
+      if (tekuchkaTrendEl && tekuchkaTrendEl.offsetParent !== null && typeof renderTekuchka === 'function') { renderTekuchka(); }
+    }, 150);
   });
 
   document.getElementById('davomatSearch').addEventListener('input', renderDavomatTable);
@@ -3590,6 +3602,7 @@ function init(){
       btn.classList.add('active');
       Array.prototype.forEach.call(document.querySelectorAll('.agroup'), function(g){ g.style.display = 'none'; });
       document.getElementById('agroup-'+target).style.display = '';
+      if (target === 'tekuchka' && typeof renderTekuchka === 'function') { renderTekuchka(); }
     });
   });
   Array.prototype.forEach.call(document.querySelectorAll('.analitika-tab[data-mode]'), function(tab){
