@@ -1608,7 +1608,8 @@ function renderTrendChart(){
     };
   });
 
-  var W = 520, H = 210, padL = 34, padR = 14, padT = 16, padB = 26;
+  var W = Math.max(320, Math.round(wrap.clientWidth || wrap.offsetWidth || 520));
+  var H = 210, padL = 34, padR = 14, padT = 16, padB = 26;
   var plotW = W - padL - padR, plotH = H - padT - padB;
   var n = pts.length;
   var xFor = function(i){ return padL + (n>1 ? i/(n-1)*plotW : plotW/2); };
@@ -3371,6 +3372,12 @@ function init(){
   renderFilialCompare();
   renderBirthdayPanel();
   renderAnniversaryPanel();
+
+  var trendResizeTimer = null;
+  window.addEventListener('resize', function(){
+    clearTimeout(trendResizeTimer);
+    trendResizeTimer = setTimeout(function(){ renderTrendChart(); }, 150);
+  });
 
   document.getElementById('davomatSearch').addEventListener('input', renderDavomatTable);
   Array.prototype.forEach.call(document.querySelectorAll('.sortable-th[data-sort]'), function(th){
