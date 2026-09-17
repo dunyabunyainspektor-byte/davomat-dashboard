@@ -2341,16 +2341,16 @@ function renderTekuchka(){
   var barsHtml = months.map(function(m){
     var hH = m.hires ? Math.max(Math.round((m.hires/maxVal)*barMaxH), 3) : 0;
     var dH = m.dismissals ? Math.max(Math.round((m.dismissals/maxVal)*barMaxH), 3) : 0;
-    var barStyle = 'width:34%;max-width:34px;min-width:12px;';
+    var barStyle = 'width:38%;min-width:12px;';
     return '<div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;">'+
       '<div style="width:100%;display:flex;align-items:flex-end;justify-content:center;gap:4%;height:'+barMaxH+'px;">'+
         '<div style="display:flex;flex-direction:column;align-items:center;">'+
           (m.hires ? '<div style="font-size:9.5px;font-weight:800;color:var(--green);margin-bottom:3px;">'+m.hires+'</div>' : '')+
-          '<div title="Qabul: '+m.hires+'" style="'+barStyle+'height:'+hH+'px;background:var(--green);border-radius:4px 4px 0 0;"></div>'+
+          '<div title="Qabul: '+m.hires+'" style="'+barStyle+'height:'+hH+'px;background:var(--green);"></div>'+
         '</div>'+
         '<div style="display:flex;flex-direction:column;align-items:center;">'+
           (m.dismissals ? '<div style="font-size:9.5px;font-weight:800;color:var(--red);margin-bottom:3px;">'+m.dismissals+'</div>' : '')+
-          '<div title="Boʻshadi: '+m.dismissals+'" style="'+barStyle+'height:'+dH+'px;background:var(--red);border-radius:4px 4px 0 0;"></div>'+
+          '<div title="Boʻshadi: '+m.dismissals+'" style="'+barStyle+'height:'+dH+'px;background:var(--red);"></div>'+
         '</div>'+
       '</div>'+
       '<div style="font-size:9px;font-weight:700;color:var(--muted);margin-top:10px;white-space:nowrap;">'+fmtMonthLabel(m.month)+'</div>'+
