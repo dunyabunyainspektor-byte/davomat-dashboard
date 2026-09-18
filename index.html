@@ -267,7 +267,6 @@
   .demo-col-lbl{flex:1;text-align:center;font-size:10px;line-height:1.25;color:var(--muted);font-weight:600;}
   .gender-row{display:flex;align-items:center;justify-content:center;gap:clamp(16px,2.4vw,40px);padding:14px 0 6px;}
   .gender-side{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:9px;cursor:pointer;flex:none;border-radius:10px;padding:4px 6px;transition:background .15s ease;}
-  .gender-side .gside-pct{font-size:clamp(11px,1vw,14px);font-weight:700;}
   .gender-side:hover{background:rgba(0,0,0,.035);}
   body.dark .gender-side:hover{background:rgba(255,255,255,.05);}
   .gender-side .gside-label{font-size:clamp(11px,1vw,14px);font-weight:700;color:var(--muted);}
@@ -2639,7 +2638,7 @@ function renderGenderCards(container, rows, totalForPct, onClick){
   // kichik "pufakcha" (badge) sifatida ko'rsatiladi.
   var svg = '<svg viewBox="0 0 100 100">'+
     arcs.map(function(a){
-      return '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+a.row.color+'" stroke-width="13" stroke-linecap="round" '+
+      return '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+a.row.color+'" stroke-width="13" stroke-linecap="butt" '+
         'stroke-dasharray="'+a.len+' '+(C-a.len)+'" stroke-dashoffset="0" transform="'+a.transform+'" class="gring-arc demo-clickable" data-gidx="'+a.row.idx+'" style="cursor:pointer;"><title>'+a.row.label+' roʻyxatini koʻrish</title></circle>';
     }).join('')+
     '</svg>'+
@@ -2648,13 +2647,13 @@ function renderGenderCards(container, rows, totalForPct, onClick){
       var pct = totalForPct ? Math.round(a.row.val/totalForPct*100) : 0;
       return '<div class="gring-badge" style="left:'+a.bx+'%;top:'+a.by+'%;">'+pct+'%</div>';
     }).join('');
+  // Foiz endi halqa qirrasidagi pufakchada ko'rsatiladi (yuqorida) - shu
+  // sababli bu yerda, son tagida, takroran ko'rsatilmaydi.
   var sideHtml = main.map(function(row, i){
-    var pct = totalForPct ? Math.round(row.val/totalForPct*100) : 0;
     return '<div class="gender-side demo-clickable" data-gidx="'+row.idx+'" title="'+row.label+' roʻyxatini koʻrish">'+
       '<div class="gside-label">'+row.label+'</div>'+
       genderIconSvg(row.kind, row.color)+
       '<div class="gside-num">'+row.val+'</div>'+
-      '<div class="gside-pct" style="color:'+row.color+';">'+pct+'%</div>'+
       '</div>';
   });
   container.innerHTML =
