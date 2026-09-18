@@ -60,6 +60,8 @@
   body.dark tbody tr:hover{background:#1A2338;}
   body.dark .cal-cell{background:#182036;}
   body.dark .mini-bar-track{background:#232C42;}
+  body.dark .demo-split-bar{background:var(--bg);}
+  body.dark .demo-col-labels{border-color:#1E2740;}
   body.dark table thead th{border-color:var(--line);}
   body.dark tbody td{border-color:#1E2740;}
   body.dark .discipline-tier{border-color:#1E2740;}
@@ -249,9 +251,20 @@
     font-size:11.5px;font-weight:700;cursor:pointer;flex:none;
   }
   .mini-bar-row .lbl{width:90px;flex:0 0 90px;color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .mini-bar-track{flex:1;height:8px;border-radius:5px;background:#EEF1F7;overflow:hidden;}
+  .mini-bar-track{flex:1;height:8px;border-radius:5px;background:#EEF1F7;overflow:hidden;position:relative;}
   .mini-bar-fill{display:block;height:100%;border-radius:5px;transition:width .7s cubic-bezier(.16,1,.3,1);box-shadow:inset 0 1px 1px rgba(255,255,255,.35);}
   .demo-val-badge{padding:2px 9px;border-radius:20px;font-weight:800;font-size:11px;white-space:nowrap;}
+  .demo-avg-marker{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--text);opacity:.32;border-radius:1px;}
+  .demo-split-bar{display:flex;gap:2px;height:22px;border-radius:7px;overflow:hidden;background:var(--card);}
+  .demo-split-seg{height:100%;}
+  .demo-legend-chip{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;cursor:pointer;}
+  .demo-legend-dot{width:10px;height:10px;border-radius:3px;flex:none;}
+  .demo-col-wrap{display:flex;align-items:flex-end;gap:8px;height:108px;}
+  .demo-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;cursor:pointer;}
+  .demo-col-n{font-size:11px;font-weight:800;color:var(--text);margin-bottom:4px;}
+  .demo-col-fill{display:block;width:100%;max-width:36px;border-radius:5px 5px 0 0;height:0%;transition:height .7s cubic-bezier(.16,1,.3,1);box-shadow:inset 0 1px 1px rgba(255,255,255,.35);}
+  .demo-col-labels{display:flex;gap:8px;border-top:1px solid var(--line);padding-top:6px;margin-top:2px;}
+  .demo-col-lbl{flex:1;text-align:center;font-size:10px;line-height:1.25;color:var(--muted);font-weight:600;}
   .mini-bar-row .val{width:26px;flex:0 0 26px;text-align:right;font-weight:800;color:var(--text);}
   .mini-stat-line{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #F0F2F7;}
   .mini-stat-line:last-child{border-bottom:none;}
@@ -937,7 +950,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             <div id="demoTenure"></div>
           </div>
         </div>
-        <div class="grid-2" style="grid-template-columns:1fr 1fr;margin-top:20px;padding-top:16px;border-top:1px solid var(--line);">
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--line);">
+          <div id="demoViolLegend" style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:14px;font-size:11px;font-weight:700;color:var(--muted);"></div>
+        </div>
+        <div class="grid-2" style="grid-template-columns:1fr 1fr;">
           <div>
             <h4 style="font-size:12.5px;font-weight:800;margin:0 0 4px;color:var(--text);">Ish staji va intizom bog'liqligi</h4>
             <div class="sub" style="color:var(--muted);font-size:11.5px;margin-bottom:10px;">Har bir staj guruhida o'rtacha necha foiz kun buzilish (kech/erta/kelmagan) bilan o'tganini ko'rsatadi</div>
@@ -2498,20 +2514,100 @@ function renderGroupCompare(){
 }
 
 function gradientBg(hex){ return 'linear-gradient(90deg, color-mix(in srgb, '+hex+' 40%, white), '+hex+')'; }
-function hueForRate(rate){
-  var r = Math.max(0, Math.min(60, rate));
-  var hue = 145 - (r/60)*145; // 145=yashil, 0=qizil
-  return 'hsl('+Math.round(hue)+',62%,44%)';
+// Intizom buzilish foiziga qarab 4 bosqichli, aniq chegarali status rangi
+// (uzluksiz gradient o'rniga) - shunda "yaxshi/ogohlantirish/jiddiy/tanqidiy"
+// darajalari bir qarashda farqlanadi.
+var STATUS_TIERS = [
+  {max:15, color:'#1E9E6B', label:'Yaxshi'},
+  {max:30, color:'#D98A15', label:'Ogohlantirish'},
+  {max:45, color:'#C2410C', label:'Jiddiy'},
+  {max:Infinity, color:'#D64545', label:'Tanqidiy'}
+];
+function statusColorForRate(rate){
+  for (var i=0;i<STATUS_TIERS.length;i++){ if (rate <= STATUS_TIERS[i].max) return STATUS_TIERS[i].color; }
+  return STATUS_TIERS[STATUS_TIERS.length-1].color;
+}
+// Ordinal (buyurtmali) guruhlar uchun ketma-ket to'qlashib boruvchi bitta
+// tusdagi rang - "kattaroq guruh = to'qroq rang" mantig'i bilan.
+function seqShade(hex, i, n){
+  var pct = n>1 ? Math.round(35 + (i/(n-1))*55) : 80;
+  return 'color-mix(in srgb, '+hex+' '+pct+'%, white)';
 }
 function animateBars(container){
   if (!container) return;
   var fills = container.querySelectorAll('.mini-bar-fill[data-w]');
+  var cols = container.querySelectorAll('.demo-col-fill[data-h]');
   requestAnimationFrame(function(){
     requestAnimationFrame(function(){
       Array.prototype.forEach.call(fills, function(f){ f.style.width = f.getAttribute('data-w')+'%'; });
+      Array.prototype.forEach.call(cols, function(f){ f.style.height = f.getAttribute('data-h')+'%'; });
     });
   });
 }
+// Bitta (buyurtmasiz, 2 toifali) "bo'lingan chiziq" - jins kabi part-to-whole
+// ma'lumot uchun: N ta ro'yxat-chiziq o'rniga bitta yagona chiziq, segmentlarga
+// bo'lingan, pastida rangli yorliqlar bilan.
+function renderSplitBar(container, rows, totalForPct, onClick){
+  var total = rows.reduce(function(s,r){return s+r.val;}, 0) || 1;
+  container.innerHTML =
+    '<div class="demo-split-bar">'+rows.map(function(r){
+      var w = Math.round(r.val/total*100);
+      return '<span class="demo-split-seg" style="width:'+w+'%;background:'+r.color+';" title="'+r.label+': '+r.val+'"></span>';
+    }).join('')+'</div>'+
+    '<div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;">'+rows.map(function(r, i){
+      var pct = totalForPct ? Math.round(r.val/totalForPct*100) : 0;
+      return '<div class="demo-legend-chip demo-clickable" data-gidx="'+i+'">'+
+        '<span class="demo-legend-dot" style="background:'+r.color+';"></span>'+
+        '<span>'+r.label+'</span>'+
+        '<span class="demo-val-badge" style="background:'+r.color+'22;color:'+r.color+';">'+r.val+' ('+pct+'%)</span>'+
+        '</div>';
+    }).join('')+'</div>';
+  Array.prototype.forEach.call(container.querySelectorAll('.demo-clickable'), function(el){
+    el.addEventListener('click', function(){ onClick(+el.getAttribute('data-gidx')); });
+  });
+}
+
+// Buyurtmali (ordinal) guruhlar bo'yicha taqsimot - vertikal ustunli
+// gistogramma, kattaroq guruh tomon asta to'qlashib boruvchi bitta tusda.
+function renderColumnHist(container, buckets, baseHex, unitLabel, onClick){
+  var max = Math.max.apply(null, buckets.map(function(b){return b.count;}).concat([1]));
+  container.innerHTML =
+    '<div class="demo-col-wrap">'+buckets.map(function(b, i){
+      var h = Math.round(b.count/max*100);
+      return '<div class="demo-col demo-clickable" data-cidx="'+i+'" title="'+b.label+': '+b.count+' '+unitLabel+'">'+
+        '<span class="demo-col-n">'+b.count+'</span>'+
+        '<span class="demo-col-fill" data-h="'+h+'" style="background:'+seqShade(baseHex, i, buckets.length)+';"></span>'+
+        '</div>';
+    }).join('')+'</div>'+
+    '<div class="demo-col-labels">'+buckets.map(function(b){
+      return '<div class="demo-col-lbl">'+b.label+'</div>';
+    }).join('')+'</div>';
+  Array.prototype.forEach.call(container.querySelectorAll('.demo-clickable'), function(el){
+    el.addEventListener('click', function(){ onClick(+el.getAttribute('data-cidx')); });
+  });
+  animateBars(container);
+}
+
+// Guruh bo'yicha intizom-buzilish foizi - bosqichli status rang + kompaniya
+// o'rtachasini ko'rsatuvchi belgi chiziq ustida, shunda "bu guruh o'rtachadan
+// yaxshimi yomonmi" bir qarashda ko'rinadi.
+function renderViolPanel(elId, buckets, companyAvg){
+  var el = document.getElementById(elId);
+  var rows = buckets.filter(function(b){return b.count>0;});
+  el.innerHTML = rows.map(function(b){
+    var avg = Math.round(b.sum/b.count);
+    var c = statusColorForRate(avg);
+    return '<div style="margin-bottom:9px;">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700;margin-bottom:5px;"><span>'+b.label+'</span><span class="demo-val-badge" style="background:'+c+'22;color:'+c+';">'+avg+'%</span></div>'+
+      '<span class="mini-bar-track" style="height:8px;display:block;">'+
+        '<span class="mini-bar-fill" data-w="'+avg+'" style="width:0%;background:'+c+';"></span>'+
+        (companyAvg!==null ? '<span class="demo-avg-marker" style="left:'+Math.min(98,companyAvg)+'%;" title="Kompaniya o\u02bbrtachasi: '+companyAvg+'%"></span>' : '')+
+      '</span>'+
+      '</div>';
+  }).join('') || '<div class="empty-state" style="padding:10px 0;">Ma\u02bblumot yo\u02bbq</div>';
+  animateBars(el);
+}
+
 function renderDemographics(){
   var genderEl = document.getElementById('demoGender');
   var ageEl = document.getElementById('demoAge');
@@ -2526,32 +2622,20 @@ function renderDemographics(){
     {label:'\ud83d\udc69 Ayol', val:female, color:'#D6486B'}
   ];
   if (unknown) genderRows.push({label:'Noma\u02bblum', val:unknown, color:'var(--slate)'});
-  var genderMax = Math.max.apply(null, genderRows.map(function(r){return r.val;}).concat([1]));
-  genderEl.innerHTML = genderRows.map(function(r, i){
-    var pct = EMP.length ? Math.round(r.val/EMP.length*100) : 0;
-    return '<div class="demo-clickable" data-gidx="'+i+'" style="margin-bottom:10px;cursor:pointer;">'+
-      '<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700;margin-bottom:5px;"><span>'+r.label+'</span><span class="demo-val-badge" style="background:'+r.color+'22;color:'+r.color+';">'+r.val+' ('+pct+'%)</span></div>'+
-      '<span class="mini-bar-track" style="height:8px;display:block;"><span class="mini-bar-fill" data-w="'+Math.round(r.val/genderMax*100)+'" style="width:0%;background-image:'+gradientBg(r.color)+'"></span></span>'+
-      '</div>';
-  }).join('');
-  animateBars(genderEl);
-  Array.prototype.forEach.call(genderEl.querySelectorAll('.demo-clickable'), function(el){
-    el.addEventListener('click', function(){
-      var i = +el.getAttribute('data-gidx');
-      var r = genderRows[i];
-      var list = r.label.indexOf('Erkak')>=0 ? EMP.filter(function(e){return e.gender==='M';})
-        : r.label.indexOf('Ayol')>=0 ? EMP.filter(function(e){return e.gender==='F';})
-        : EMP.filter(function(e){return e.gender!=='M'&&e.gender!=='F';});
-      openPeopleModal(r.label+' ('+list.length+' kishi)', list);
-    });
+  renderSplitBar(genderEl, genderRows, EMP.length, function(i){
+    var r = genderRows[i];
+    var list = r.label.indexOf('Erkak')>=0 ? EMP.filter(function(e){return e.gender==='M';})
+      : r.label.indexOf('Ayol')>=0 ? EMP.filter(function(e){return e.gender==='F';})
+      : EMP.filter(function(e){return e.gender!=='M'&&e.gender!=='F';});
+    openPeopleModal(r.label+' ('+list.length+' kishi)', list);
   });
 
   var ageBuckets = [
-    {label:'<20', min:0, max:19, count:0},
-    {label:'20\u201325', min:20, max:25, count:0},
-    {label:'26\u201330', min:26, max:30, count:0},
-    {label:'31\u201340', min:31, max:40, count:0},
-    {label:'40+', min:41, max:200, count:0}
+    {label:'<20 yosh', min:0, max:19, count:0},
+    {label:'20\u201325 yosh', min:20, max:25, count:0},
+    {label:'26\u201330 yosh', min:26, max:30, count:0},
+    {label:'31\u201340 yosh', min:31, max:40, count:0},
+    {label:'40+ yosh', min:41, max:200, count:0}
   ];
   EMP.forEach(function(e){
     var age = calcAge(e.birth_date);
@@ -2559,21 +2643,10 @@ function renderDemographics(){
     var b = ageBuckets.filter(function(bk){ return age>=bk.min && age<=bk.max; })[0];
     if (b) b.count++;
   });
-  var ageMax = Math.max.apply(null, ageBuckets.map(function(b){return b.count;}).concat([1]));
-  ageEl.innerHTML = ageBuckets.map(function(b, i){
-    return '<div class="demo-clickable" data-aidx="'+i+'" style="margin-bottom:9px;cursor:pointer;">'+
-      '<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700;margin-bottom:5px;"><span>'+b.label+' yosh</span><span class="demo-val-badge" style="background:#8B5CF622;color:#8B5CF6;">'+b.count+' kishi</span></div>'+
-      '<span class="mini-bar-track" style="height:8px;display:block;"><span class="mini-bar-fill" data-w="'+Math.round(b.count/ageMax*100)+'" style="width:0%;background-image:'+gradientBg('#8B5CF6')+'"></span></span>'+
-      '</div>';
-  }).join('');
-  animateBars(ageEl);
-  Array.prototype.forEach.call(ageEl.querySelectorAll('.demo-clickable'), function(el){
-    el.addEventListener('click', function(){
-      var i = +el.getAttribute('data-aidx');
-      var b = ageBuckets[i];
-      var list = EMP.filter(function(e){ var age=calcAge(e.birth_date); return age!==null && age>=b.min && age<=b.max; });
-      openPeopleModal(b.label+' yosh ('+list.length+' kishi)', list);
-    });
+  renderColumnHist(ageEl, ageBuckets, '#8B5CF6', 'kishi', function(i){
+    var b = ageBuckets[i];
+    var list = EMP.filter(function(e){ var age=calcAge(e.birth_date); return age!==null && age>=b.min && age<=b.max; });
+    openPeopleModal(b.label+' ('+list.length+' kishi)', list);
   });
 
   var tenureBuckets = [
@@ -2589,24 +2662,18 @@ function renderDemographics(){
     var b = tenureBuckets.filter(function(bk){ return m>=bk.min && m<=bk.max; })[0];
     if (b) b.count++;
   });
-  var tenureMax = Math.max.apply(null, tenureBuckets.map(function(b){return b.count;}).concat([1]));
-  tenureEl.innerHTML = tenureBuckets.map(function(b, i){
-    return '<div class="demo-clickable" data-tidx="'+i+'" style="margin-bottom:9px;cursor:pointer;">'+
-      '<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700;margin-bottom:5px;"><span>'+b.label+'</span><span class="demo-val-badge" style="background:#1EB07322;color:#1EB073;">'+b.count+' kishi</span></div>'+
-      '<span class="mini-bar-track" style="height:8px;display:block;"><span class="mini-bar-fill" data-w="'+Math.round(b.count/tenureMax*100)+'" style="width:0%;background-image:'+gradientBg('#1EB073')+'"></span></span>'+
-      '</div>';
-  }).join('');
-  animateBars(tenureEl);
-  Array.prototype.forEach.call(tenureEl.querySelectorAll('.demo-clickable'), function(el){
-    el.addEventListener('click', function(){
-      var i = +el.getAttribute('data-tidx');
-      var b = tenureBuckets[i];
-      var list = EMP.filter(function(e){ var m=calcTenureMonths(e.hire_date); return m!==null && m>=b.min && m<=b.max; });
-      openPeopleModal(b.label+' staj ('+list.length+' kishi)', list);
-    });
+  renderColumnHist(tenureEl, tenureBuckets, '#1EB073', 'kishi', function(i){
+    var b = tenureBuckets[i];
+    var list = EMP.filter(function(e){ var m=calcTenureMonths(e.hire_date); return m!==null && m>=b.min && m<=b.max; });
+    openPeopleModal(b.label+' staj ('+list.length+' kishi)', list);
   });
 
-  function violBarColor(rate){ return hueForRate(rate); }
+  var legendEl = document.getElementById('demoViolLegend');
+  if (legendEl){
+    legendEl.innerHTML = STATUS_TIERS.map(function(t){
+      return '<span style="display:flex;align-items:center;gap:5px;"><span style="width:9px;height:9px;border-radius:3px;background:'+t.color+';display:inline-block;"></span>'+t.label+'</span>';
+    }).join('') + '<span style="display:flex;align-items:center;gap:5px;"><span style="width:2px;height:11px;background:var(--text);opacity:.32;display:inline-block;"></span>Kompaniya o\u02bbrtachasi</span>';
+  }
 
   var tenureViolBuckets = [
     {label:'6 oydan kam', min:0, max:5, sum:0, count:0},
@@ -2615,46 +2682,34 @@ function renderDemographics(){
     {label:'2\u20135 yil', min:24, max:59, sum:0, count:0},
     {label:'5+ yil', min:60, max:9999, sum:0, count:0}
   ];
+  var tenureAllSum = 0, tenureAllN = 0;
   EMP.forEach(function(e){
     var m = calcTenureMonths(e.hire_date);
     var rate = calcViolationRate(e);
     if (m===null || rate===null) return;
     var b = tenureViolBuckets.filter(function(bk){ return m>=bk.min && m<=bk.max; })[0];
     if (b){ b.sum += rate; b.count++; }
+    tenureAllSum += rate; tenureAllN++;
   });
-  document.getElementById('demoTenureViol').innerHTML = tenureViolBuckets.filter(function(b){return b.count>0;}).map(function(b){
-    var avg = Math.round(b.sum/b.count);
-    var c = violBarColor(avg);
-    return '<div style="margin-bottom:9px;">'+
-      '<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700;margin-bottom:5px;"><span>'+b.label+'</span><span class="demo-val-badge" style="background:'+c+'22;color:'+c+';">'+avg+'%</span></div>'+
-      '<span class="mini-bar-track" style="height:8px;display:block;"><span class="mini-bar-fill" data-w="'+avg+'" style="width:0%;background-image:'+gradientBg(c)+'"></span></span>'+
-      '</div>';
-  }).join('') || '<div class="empty-state" style="padding:10px 0;">Ma\u02bblumot yo\u02bbq</div>';
-  animateBars(document.getElementById('demoTenureViol'));
+  renderViolPanel('demoTenureViol', tenureViolBuckets, tenureAllN ? Math.round(tenureAllSum/tenureAllN) : null);
 
   var ageViolBuckets = [
-    {label:'<20', min:0, max:19, sum:0, count:0},
-    {label:'20\u201325', min:20, max:25, sum:0, count:0},
-    {label:'26\u201330', min:26, max:30, sum:0, count:0},
-    {label:'31\u201340', min:31, max:40, sum:0, count:0},
-    {label:'40+', min:41, max:200, sum:0, count:0}
+    {label:'<20 yosh', min:0, max:19, sum:0, count:0},
+    {label:'20\u201325 yosh', min:20, max:25, sum:0, count:0},
+    {label:'26\u201330 yosh', min:26, max:30, sum:0, count:0},
+    {label:'31\u201340 yosh', min:31, max:40, sum:0, count:0},
+    {label:'40+ yosh', min:41, max:200, sum:0, count:0}
   ];
+  var ageAllSum = 0, ageAllN = 0;
   EMP.forEach(function(e){
     var age = calcAge(e.birth_date);
     var rate = calcViolationRate(e);
     if (age===null || rate===null) return;
     var b = ageViolBuckets.filter(function(bk){ return age>=bk.min && age<=bk.max; })[0];
     if (b){ b.sum += rate; b.count++; }
+    ageAllSum += rate; ageAllN++;
   });
-  document.getElementById('demoAgeViol').innerHTML = ageViolBuckets.filter(function(b){return b.count>0;}).map(function(b){
-    var avg = Math.round(b.sum/b.count);
-    var c = violBarColor(avg);
-    return '<div style="margin-bottom:9px;">'+
-      '<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700;margin-bottom:5px;"><span>'+b.label+' yosh</span><span class="demo-val-badge" style="background:'+c+'22;color:'+c+';">'+avg+'%</span></div>'+
-      '<span class="mini-bar-track" style="height:8px;display:block;"><span class="mini-bar-fill" data-w="'+avg+'" style="width:0%;background-image:'+gradientBg(c)+'"></span></span>'+
-      '</div>';
-  }).join('') || '<div class="empty-state" style="padding:10px 0;">Ma\u02bblumot yo\u02bbq</div>';
-  animateBars(document.getElementById('demoAgeViol'));
+  renderViolPanel('demoAgeViol', ageViolBuckets, ageAllN ? Math.round(ageAllSum/ageAllN) : null);
 }
 
 function renderFaceidTrend(){
