@@ -2304,7 +2304,7 @@ function fmtMonthLabel(ym){
   return names[parseInt(parts[1],10)-1] + " '" + parts[0].slice(2);
 }
 
-function fmtTenure(days){
+function fmtTenureDays(days){
   if (days===null || days===undefined) return '—';
   if (days < 30) return days + ' kun';
   var months = Math.round(days/30.4);
@@ -2332,7 +2332,7 @@ function renderTekuchka(){
     '<div class="stat-card c-ontime"><div class="num">'+st.hired_last12+'</div><div class="lbl">Oxirgi 12 oyda qabul qilinganlar</div></div>'+
     '<div class="stat-card c-lateearly"><div class="num">'+st.dismissed_last12+'</div><div class="lbl">Oxirgi 12 oyda ketganlar</div></div>'+
     '<div class="stat-card c-late"><div class="num">'+st.turnover_rate_last12.toFixed(1)+'%</div><div class="lbl">Tekuchka darajasi (yillik)</div></div>'+
-    '<div class="stat-card c-ongoing"><div class="num">'+fmtTenure(st.avg_tenure_days_dismissed)+'</div><div class="lbl">Ketganlarning oʻrtacha staji</div></div>';
+    '<div class="stat-card c-ongoing"><div class="num">'+fmtTenureDays(st.avg_tenure_days_dismissed)+'</div><div class="lbl">Ketganlarning oʻrtacha staji</div></div>';
 
   // ---- oylik trend: divergent ustunlar - qabul (yashil) yuqoriga, bo'shash (qizil) pastga ----
   var months = T.monthly.slice(-12);
@@ -2394,7 +2394,7 @@ function renderTekuchka(){
   if (tbody){
     tbody.innerHTML = T.recent_leavers.map(function(r){
       return '<tr><td style="font-weight:700;">'+r.name+'</td><td>'+r.division_name+'</td><td>'+r.job_name+'</td>'+
-        '<td>'+(r.hiring_date||'—')+'</td><td>'+(r.dismissal_date||'—')+'</td><td>'+fmtTenure(r.tenure_days)+'</td></tr>';
+        '<td>'+(r.hiring_date||'—')+'</td><td>'+(r.dismissal_date||'—')+'</td><td>'+fmtTenureDays(r.tenure_days)+'</td></tr>';
     }).join('');
   }
 }
