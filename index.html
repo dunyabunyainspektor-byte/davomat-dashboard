@@ -265,19 +265,17 @@
   .demo-col-fill{display:block;width:100%;max-width:36px;border-radius:5px 5px 0 0;height:0%;transition:height .7s cubic-bezier(.16,1,.3,1);box-shadow:inset 0 1px 1px rgba(255,255,255,.35);}
   .demo-col-labels{display:flex;gap:8px;border-top:1px solid var(--line);padding-top:6px;margin-top:2px;}
   .demo-col-lbl{flex:1;text-align:center;font-size:10px;line-height:1.25;color:var(--muted);font-weight:600;}
-  .gender-wrap{display:flex;padding-top:10px;}
-  .gender-col{flex:1;padding:0 18px 0 0;cursor:pointer;}
-  .gender-col+.gender-col{border-left:1px solid var(--line);padding-left:18px;}
-  .gender-col-head{display:flex;align-items:center;justify-content:space-between;gap:10px;}
-  .gender-col .gbadge{width:44px;height:44px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;line-height:1;}
-  .gender-col .gnum{font-size:27px;font-weight:800;line-height:1;color:var(--text);}
-  .gender-col .gpct{font-size:12.5px;font-weight:700;margin-top:5px;}
-  .gender-col .glabel{font-size:11.5px;font-weight:700;color:var(--muted);margin-top:11px;}
-  .gender-col .gtrack{height:4px;width:100%;max-width:150px;border-radius:3px;background:var(--line);margin-top:11px;overflow:hidden;}
-  .gender-col .gfill{display:block;height:100%;border-radius:3px;width:0%;transition:width .7s cubic-bezier(.16,1,.3,1);}
-  .gender-rest{display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:16px;}
-  .gender-rest-chip{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;}
-  .gender-rest-chip .dot{width:8px;height:8px;border-radius:2px;flex:none;}
+  .gender-row{display:flex;align-items:center;justify-content:center;gap:20px;padding:14px 0 6px;}
+  .gender-side{display:flex;flex-direction:column;align-items:center;text-align:center;gap:9px;cursor:pointer;flex:none;border-radius:10px;padding:4px 6px;transition:background .15s ease;}
+  .gender-side:hover{background:rgba(0,0,0,.035);}
+  body.dark .gender-side:hover{background:rgba(255,255,255,.05);}
+  .gender-side .gside-label{font-size:11.5px;font-weight:700;color:var(--muted);}
+  .gender-side .gside-icon{width:32px;height:32px;}
+  .gender-side .gside-num{font-size:23px;font-weight:800;color:var(--text);line-height:1;}
+  .gender-ring-wrap{width:98px;height:98px;flex:none;}
+  .gender-ring-wrap svg{width:100%;height:100%;overflow:visible;}
+  .gring-arc{transition:stroke-dasharray .7s cubic-bezier(.16,1,.3,1);}
+  .gring-label{font-size:9.5px;font-weight:800;pointer-events:none;}
   .mini-bar-row .val{width:26px;flex:0 0 26px;text-align:right;font-weight:800;color:var(--text);}
   .mini-stat-line{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #F0F2F7;}
   .mini-stat-line:last-child{border-bottom:none;}
@@ -2586,37 +2584,66 @@ function renderSplitBar(container, rows, totalForPct, onClick){
 
 // Erkak/ayol uchun sodda, professional belgi-nishon (astronomik jins
 // belgisi - xalqaro tan olingan, sxematik odam-siluetidan ko'ra neytralroq).
+// Sodda, umumiy odam-siluet ikonkasi - ikkala jins uchun ham bir xil shakl,
+// faqat rang bilan farqlanadi (foydalanuvchi qo'lda chizib bergan eskizga
+// mos: ikkala tomonda bir xil sxematik ikonka).
 function genderIconSvg(kind, color){
-  var sym = kind === 'F' ? '♀' : '♂';
-  return '<span class="gbadge" style="background:color-mix(in srgb, '+color+' 16%, var(--card));color:'+color+';">'+sym+'</span>';
+  return '<svg class="gside-icon" viewBox="0 0 24 24" fill="none" style="color:'+color+';"><circle cx="12" cy="8" r="4.2" fill="currentColor"/><path d="M4.5 21c0-4.7 3.4-8.5 7.5-8.5s7.5 3.8 7.5 8.5" fill="currentColor"/></svg>';
 }
 
 // Jins bo'yicha taqsimot - erkak/ayol uchun ikonka-kartochka ko'rinishida
 // (aniq son + foiz + silliq progress-chiziq), qolgan toifalar (masalan
 // "Noma'lum") kichik chiplar sifatida pastda ko'rsatiladi.
+// Jins bo'yicha - markazda ikki segmentli halqa (donut) diagramma, har bir
+// yon tomonda ikonka+son. Ulush (%) halqaning o'zida ko'rsatiladi, shuning
+// uchun faqat erkak/ayol ulushiga nisbatan hisoblanadi (110% chiqib
+// ketmasligi uchun "noma'lum" alohida qator sifatida ko'rsatilmaydi - u
+// haqida ma'lumot butun blokning title-atributida qoladi).
 function renderGenderCards(container, rows, totalForPct, onClick){
   var main = rows.filter(function(r){ return r.kind==='M' || r.kind==='F'; });
   var rest = rows.filter(function(r){ return r.kind!=='M' && r.kind!=='F'; });
+  var ringTotal = main.reduce(function(s,r){return s+r.val;}, 0) || 1;
+  var cx = 50, cy = 50, r = 38, C = 2*Math.PI*r, gap = 3;
+  var cum = 0; // shu paytgacha bosib o'tilgan ulush (0..1)
+  var arcs = main.map(function(row){
+    var frac = row.val/ringTotal;
+    var len = Math.max(0, frac*C - gap);
+    var offset = -cum*C;
+    var midAngle = -90 + (cum + frac/2)*360;
+    var rad = midAngle*Math.PI/180;
+    var lx = cx + (r)*Math.cos(rad), ly = cy + (r)*Math.sin(rad);
+    cum += frac;
+    return {row: row, frac: frac, len: len, offset: offset, lx: lx, ly: ly};
+  });
+  var svg = '<svg viewBox="0 0 100 100">'+
+    arcs.map(function(a){
+      return '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+a.row.color+'" stroke-width="13" '+
+        'stroke-dasharray="'+a.len+' '+(C-a.len)+'" stroke-dashoffset="'+a.offset+'" transform="rotate(-90 '+cx+' '+cy+')" class="gring-arc demo-clickable" data-gidx="'+a.row.idx+'" style="cursor:pointer;"><title>'+a.row.label+' roʻyxatini koʻrish</title></circle>';
+    }).join('')+
+    arcs.filter(function(a){ return a.frac > 0.06; }).map(function(a){
+      var pct = totalForPct ? Math.round(a.row.val/totalForPct*100) : Math.round(a.frac*100);
+      return '<text x="'+a.lx+'" y="'+a.ly+'" text-anchor="middle" dominant-baseline="central" class="gring-label" fill="#fff">'+pct+'%</text>';
+    }).join('')+
+    '</svg>';
+  var sideHtml = main.map(function(row, i){
+    var side = i===0 ? 'left' : 'right';
+    return '<div class="gender-side demo-clickable" data-gidx="'+row.idx+'" title="'+row.label+' roʻyxatini koʻrish">'+
+      '<div class="gside-label">'+row.label+'</div>'+
+      genderIconSvg(row.kind, row.color)+
+      '<div class="gside-num">'+row.val+'</div>'+
+      '</div>';
+  });
+  var unknownRow = rest[0];
+  var wrapTitle = unknownRow ? (' title="Jami '+totalForPct+' kishi - shundan '+unknownRow.val+' kishining jinsi Verifix’da koʻrsatilmagan, ulushga kiritilmagan"') : '';
   container.innerHTML =
-    '<div class="gender-wrap">'+main.map(function(r){
-      var pct = totalForPct ? Math.round(r.val/totalForPct*100) : 0;
-      return '<div class="gender-col demo-clickable" data-gidx="'+r.idx+'" title="'+r.label+' roʻyxatini koʻrish">'+
-        '<div class="gender-col-head">'+
-          '<div><div class="gnum">'+r.val+'</div><div class="gpct" style="color:'+r.color+';">'+pct+'%</div></div>'+
-          genderIconSvg(r.kind, r.color)+
-        '</div>'+
-        '<div class="glabel">'+r.label+'</div>'+
-        '<div class="gtrack"><span class="gfill" data-w="'+pct+'" style="background:'+r.color+';"></span></div>'+
-        '</div>';
-    }).join('')+'</div>'+
-    (rest.length ? '<div class="gender-rest">'+rest.map(function(r){
-      var pct = totalForPct ? Math.round(r.val/totalForPct*100) : 0;
-      return '<div class="gender-rest-chip demo-clickable" data-gidx="'+r.idx+'"><span class="dot" style="background:'+r.color+';"></span>'+r.label+': '+r.val+' ('+pct+'%)</div>';
-    }).join('')+'</div>' : '');
+    '<div class="gender-row"'+wrapTitle+'>'+
+      (sideHtml[0]||'')+
+      '<div class="gender-ring-wrap">'+svg+'</div>'+
+      (sideHtml[1]||'')+
+    '</div>';
   Array.prototype.forEach.call(container.querySelectorAll('.demo-clickable'), function(el){
     el.addEventListener('click', function(){ onClick(+el.getAttribute('data-gidx')); });
   });
-  animateBars(container);
 }
 
 // Buyurtmali (ordinal) guruhlar bo'yicha taqsimot - vertikal ustunli
