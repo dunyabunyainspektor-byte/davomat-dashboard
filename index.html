@@ -2605,14 +2605,20 @@ function renderGenderCards(container, rows, totalForPct, onClick){
   // Har bir segment YUQORIDAN (soat 12) boshlanadi va o'z tomoniga - chapdagi
   // (Erkaklar) soat mili yo'nalishiga teskari (chapga), o'ngdagi (Ayollar)
   // soat mili yo'nalishida (o'ngga) - qarab yoyiladi, shunda har bir ulush
-  // vizual ravishda o'z yorlig'i tomonga "qaraydi".
+  // vizual ravishda o'z yorlig'i tomonga "qaraydi". Boshlanish nuqtasi
+  // gap/2 ga o'z segmenti ichiga surilgan - aks holda ikkala segment ham
+  // xuddi shu soat-12 nuqtasidan boshlanib, butun bo'shliq (2*gap) faqat
+  // BITTA (qarama-qarshi) tomonda to'planib qolar, ikkinchi uchida esa
+  // bo'shliq umuman ko'rinmas edi.
+  var startShiftDeg = (gap/2)/C*360;
   var arcs = main.map(function(row, i){
     var frac = row.val/ringTotal;
     var len = Math.max(0, frac*C - gap);
     var dir = (i === 0) ? -1 : 1;
+    var rot = -90 + startShiftDeg;
     var transform = dir === 1
-      ? ('rotate(-90 '+cx+' '+cy+')')
-      : ('translate('+(2*cx)+' 0) scale(-1 1) rotate(-90 '+cx+' '+cy+')');
+      ? ('rotate('+rot+' '+cx+' '+cy+')')
+      : ('translate('+(2*cx)+' 0) scale(-1 1) rotate('+rot+' '+cx+' '+cy+')');
     return {row: row, frac: frac, len: len, transform: transform};
   });
   // Halqaning o'zida matn yo'q (tor segmentda kesilib/joylashuvi buzilib
