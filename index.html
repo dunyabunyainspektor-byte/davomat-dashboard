@@ -266,14 +266,14 @@
   .demo-col-labels{display:flex;gap:8px;border-top:1px solid var(--line);padding-top:6px;margin-top:2px;}
   .demo-col-lbl{flex:1;text-align:center;font-size:10px;line-height:1.25;color:var(--muted);font-weight:600;}
   .gender-wrap{display:flex;}
-  .gender-col{flex:1;display:flex;align-items:center;gap:12px;padding:2px 14px 2px 0;cursor:pointer;}
-  .gender-col+.gender-col{border-left:1px solid var(--line);padding-left:14px;}
-  .gender-col .gicon{width:52px;height:52px;flex:none;opacity:.92;}
-  .gender-col .gstat{min-width:0;}
-  .gender-col .gnum{font-size:23px;font-weight:800;line-height:1;color:var(--text);}
-  .gender-col .gpct{font-size:12px;font-weight:700;margin-top:3px;}
-  .gender-col .glabel{font-size:11.5px;font-weight:700;color:var(--muted);margin-top:6px;}
-  .gender-col .gtrack{height:4px;width:78px;border-radius:3px;background:var(--line);margin-top:8px;overflow:hidden;}
+  .gender-col{flex:1;padding:0 18px 0 0;cursor:pointer;}
+  .gender-col+.gender-col{border-left:1px solid var(--line);padding-left:18px;}
+  .gender-col-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+  .gender-col .gicon{width:46px;height:46px;flex:none;opacity:.9;}
+  .gender-col .gnum{font-size:25px;font-weight:800;line-height:1;color:var(--text);}
+  .gender-col .gpct{font-size:12.5px;font-weight:700;margin-top:4px;}
+  .gender-col .glabel{font-size:11.5px;font-weight:700;color:var(--muted);margin-top:8px;}
+  .gender-col .gtrack{height:4px;width:100%;max-width:150px;border-radius:3px;background:var(--line);margin-top:9px;overflow:hidden;}
   .gender-col .gfill{display:block;height:100%;border-radius:3px;width:0%;transition:width .7s cubic-bezier(.16,1,.3,1);}
   .gender-rest{display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:10px;}
   .gender-rest-chip{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;}
@@ -2601,13 +2601,12 @@ function renderGenderCards(container, rows, totalForPct, onClick){
     '<div class="gender-wrap">'+main.map(function(r){
       var pct = totalForPct ? Math.round(r.val/totalForPct*100) : 0;
       return '<div class="gender-col demo-clickable" data-gidx="'+r.idx+'" title="'+r.label+' roʻyxatini koʻrish">'+
-        genderIconSvg(r.kind, r.color)+
-        '<div class="gstat">'+
-          '<div class="gnum">'+r.val+'</div>'+
-          '<div class="gpct" style="color:'+r.color+';">'+pct+'%</div>'+
-          '<div class="glabel">'+r.label+'</div>'+
-          '<div class="gtrack"><span class="gfill" data-w="'+pct+'" style="background:'+r.color+';"></span></div>'+
+        '<div class="gender-col-head">'+
+          '<div><div class="gnum">'+r.val+'</div><div class="gpct" style="color:'+r.color+';">'+pct+'%</div></div>'+
+          genderIconSvg(r.kind, r.color)+
         '</div>'+
+        '<div class="glabel">'+r.label+'</div>'+
+        '<div class="gtrack"><span class="gfill" data-w="'+pct+'" style="background:'+r.color+';"></span></div>'+
         '</div>';
     }).join('')+'</div>'+
     (rest.length ? '<div class="gender-rest">'+rest.map(function(r){
