@@ -2591,17 +2591,12 @@ function genderIconSvg(kind, color){
   return '<svg class="gside-icon" viewBox="0 0 24 24" fill="none" style="color:'+color+';"><circle cx="12" cy="8" r="4.2" fill="currentColor"/><path d="M4.5 21c0-4.7 3.4-8.5 7.5-8.5s7.5 3.8 7.5 8.5" fill="currentColor"/></svg>';
 }
 
-// Jins bo'yicha taqsimot - erkak/ayol uchun ikonka-kartochka ko'rinishida
-// (aniq son + foiz + silliq progress-chiziq), qolgan toifalar (masalan
-// "Noma'lum") kichik chiplar sifatida pastda ko'rsatiladi.
 // Jins bo'yicha - markazda ikki segmentli halqa (donut) diagramma, har bir
 // yon tomonda ikonka+son. Ulush (%) halqaning o'zida ko'rsatiladi, shuning
 // uchun faqat erkak/ayol ulushiga nisbatan hisoblanadi (110% chiqib
-// ketmasligi uchun "noma'lum" alohida qator sifatida ko'rsatilmaydi - u
-// haqida ma'lumot butun blokning title-atributida qoladi).
+// ketmasligi uchun boshqa toifalar bu diagrammaga kiritilmaydi).
 function renderGenderCards(container, rows, totalForPct, onClick){
   var main = rows.filter(function(r){ return r.kind==='M' || r.kind==='F'; });
-  var rest = rows.filter(function(r){ return r.kind!=='M' && r.kind!=='F'; });
   var ringTotal = main.reduce(function(s,r){return s+r.val;}, 0) || 1;
   var cx = 50, cy = 50, r = 38, C = 2*Math.PI*r, gap = 3;
   var cum = 0; // shu paytgacha bosib o'tilgan ulush (0..1)
@@ -2633,10 +2628,8 @@ function renderGenderCards(container, rows, totalForPct, onClick){
       '<div class="gside-num">'+row.val+'</div>'+
       '</div>';
   });
-  var unknownRow = rest[0];
-  var wrapTitle = unknownRow ? (' title="Jami '+totalForPct+' kishi - shundan '+unknownRow.val+' kishining jinsi Verifix’da koʻrsatilmagan, ulushga kiritilmagan"') : '';
   container.innerHTML =
-    '<div class="gender-row"'+wrapTitle+'>'+
+    '<div class="gender-row">'+
       (sideHtml[0]||'')+
       '<div class="gender-ring-wrap">'+svg+'</div>'+
       (sideHtml[1]||'')+
