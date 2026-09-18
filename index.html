@@ -279,6 +279,8 @@
   .gring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;}
   .gring-center-num{font-size:clamp(17px,1.7vw,24px);font-weight:800;color:var(--text);line-height:1;}
   .gring-center-lbl{font-size:clamp(8.5px,.8vw,10px);font-weight:700;color:var(--muted);margin-top:3px;letter-spacing:.02em;text-align:center;}
+  .gring-badge{position:absolute;transform:translate(-50%,-50%);background:var(--card);color:var(--text);font-size:clamp(9.5px,.95vw,12px);font-weight:800;padding:3px 7px;border-radius:999px;box-shadow:0 2px 7px rgba(20,30,60,.18);pointer-events:none;white-space:nowrap;line-height:1.2;}
+  body.dark .gring-badge{box-shadow:0 2px 7px rgba(0,0,0,.5);}
   .mini-bar-row .val{width:26px;flex:0 0 26px;text-align:right;font-weight:800;color:var(--text);}
   .mini-stat-line{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #F0F2F7;}
   .mini-stat-line:last-child{border-bottom:none;}
@@ -2611,26 +2613,41 @@ function renderGenderCards(container, rows, totalForPct, onClick){
   // BITTA (qarama-qarshi) tomonda to'planib qolar, ikkinchi uchida esa
   // bo'shliq umuman ko'rinmas edi.
   var startShiftDeg = (gap/2)/C*360;
+  var rBadge = r + 8;
   var arcs = main.map(function(row, i){
     var frac = row.val/ringTotal;
     var len = Math.max(0, frac*C - gap);
     var dir = (i === 0) ? -1 : 1;
     var rot = -90 + startShiftDeg;
+    var sweepDeg = (len/C)*360;
+    // Segmentning o'rta nuqtasi burchagi (0deg = soat 3, soat yo'nalishida
+    // ortadi) - foiz "pufakcha"sini halqa qirrasida shu nuqtaga joylash
+    // uchun kerak. Oynadagi (male) tomon uchun burchak translate+scale
+    // ko'zgusi orqali aks ettiriladi: theta' = 180 - theta.
+    var midDeg = dir === 1 ? (rot + sweepDeg/2) : (180 - (rot + sweepDeg/2));
+    var midRad = midDeg*Math.PI/180;
+    var bx = cx + rBadge*Math.cos(midRad);
+    var by = cy + rBadge*Math.sin(midRad);
     var transform = dir === 1
       ? ('rotate('+rot+' '+cx+' '+cy+')')
       : ('translate('+(2*cx)+' 0) scale(-1 1) rotate('+rot+' '+cx+' '+cy+')');
-    return {row: row, frac: frac, len: len, transform: transform};
+    return {row: row, frac: frac, len: len, transform: transform, bx: bx, by: by};
   });
-  // Halqaning o'zida matn yo'q (tor segmentda kesilib/joylashuvi buzilib
-  // qolishi mumkin) - foiz ko'rsatkichi halqadan TASHQARIDA, har bir tomon
-  // blokida son ostida ko'rsatiladi.
+  // Halqaning o'zida segment chizig'i ustida matn yo'q (tor segmentda
+  // kesilib/joylashuvi buzilib qolishi mumkin) - foiz ko'rsatkichi har bir
+  // segmentning o'rtasida, halqa qirrasidan biroz tashqariga chiqib turuvchi
+  // kichik "pufakcha" (badge) sifatida ko'rsatiladi.
   var svg = '<svg viewBox="0 0 100 100">'+
     arcs.map(function(a){
       return '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+a.row.color+'" stroke-width="13" stroke-linecap="round" '+
         'stroke-dasharray="'+a.len+' '+(C-a.len)+'" stroke-dashoffset="0" transform="'+a.transform+'" class="gring-arc demo-clickable" data-gidx="'+a.row.idx+'" style="cursor:pointer;"><title>'+a.row.label+' roʻyxatini koʻrish</title></circle>';
     }).join('')+
     '</svg>'+
-    '<div class="gring-center"><div class="gring-center-num">'+ringTotal+'</div><div class="gring-center-lbl">Jami xodim</div></div>';
+    '<div class="gring-center"><div class="gring-center-num">'+ringTotal+'</div><div class="gring-center-lbl">Jami xodim</div></div>'+
+    arcs.map(function(a){
+      var pct = totalForPct ? Math.round(a.row.val/totalForPct*100) : 0;
+      return '<div class="gring-badge" style="left:'+a.bx+'%;top:'+a.by+'%;">'+pct+'%</div>';
+    }).join('');
   var sideHtml = main.map(function(row, i){
     var pct = totalForPct ? Math.round(row.val/totalForPct*100) : 0;
     return '<div class="gender-side demo-clickable" data-gidx="'+row.idx+'" title="'+row.label+' roʻyxatini koʻrish">'+
