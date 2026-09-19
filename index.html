@@ -1142,16 +1142,23 @@ function fmtMoney(n){
 }
 function confirmedOntimeDays(e){
   if (e.bonus_exempt) return 0;
-  // DIQQAT: bonus kunlari soni backend (davomat_yangilash.py)dagi haqiqiy
-  // bonus ro'yxatidan (e.bonus.days) olinishi SHART, status==='ontime'
-  // bo'yicha bu yerda QAYTA hisoblab bo'lmaydi - chunki rasmiy dam olish/
-  // bayram kunida ixtiyoriy ishlagan kun backendda ALOHIDA status
-  // ('holiday_worked') bilan belgilanadi, lekin baribir bonusga tushadi
-  // (backenddagi voluntary_ontime mantig'i). Avval shu yerda status
-  // bo'yicha qayta hisoblanganda bunday kunlar bonus ro'yxatida (pastdagi
-  // "Davomat bonusi" chiplarida) ko'rinib turib, lekin "Jami bonus (N kun)"
-  // sonidan va summasidan TUSHIB QOLAR edi (N bitta kam chiqardi).
-  return e.bonus.days.length;
+  // DIQQAT: bu funksiya butun shablon.html bo'ylab "Jami bonus (N kun)"
+  // YALPI (gross) sonini beradi - undan pastda ALOHIDA "FaceID sababli
+  // yo'qotilgan" qatori ayiriladi (grossBonus - faceidLossAmt = Yakuniy
+  // bonus). Shu sabab N BU YERDA quyidagi IKKALASINI ham o'z ichiga olishi
+  // SHART:
+  //  1) e.bonus.days - haqiqatan to'langan kunlar (backenddagi bonus_days),
+  //     shu jumladan rasmiy dam olish/bayram kunida ixtiyoriy ishlab, vaqtida
+  //     kelib-ketgan kunlar ham (status='holiday_worked', 'ontime' EMAS).
+  //  2) e.bonus.cancelled_faceid - vaqtida kelib-ketgan (status='ontime')
+  //     bo'lsa ham, FaceID/chiqish belgisi yo'qligi sababli PASTDA alohida
+  //     ayiriladigan kunlar - булар YALPI songa albatta KIRISHI kerak,
+  //     aks holda pastdagi "-FaceID yo'qotilgan" qatori ULARNI IKKINCHI
+  //     MARTA ayirib, "Yakuniy bonus"ni haqiqiy summadan kam ko'rsatadi.
+  // (incomplete_norm - normani to'liq ishlamagan kunlar - hozircha bu
+  // pul hisobida alohida qator sifatida ko'rsatilmagani uchun bu yerga
+  // ATAYLAB qo'shilmagan, avvalgi holat bilan bir xil qoldirilgan.)
+  return e.bonus.days.length + e.bonus.cancelled_faceid.length;
 }
 function initials(fio){
   var parts = fio.trim().split(/\s+/);
