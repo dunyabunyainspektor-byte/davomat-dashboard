@@ -439,6 +439,10 @@
     font-size:11.5px;font-weight:700;white-space:nowrap;
   }
   .badge .dot{width:6px;height:6px;border-radius:50%;}
+  .late-min-tag{
+    display:inline-block;margin-left:7px;font-size:11px;font-weight:700;
+    color:var(--muted);white-space:nowrap;
+  }
   .b-ontime{background:var(--green-soft);color:var(--green);}
   .b-late{background:var(--amber-soft);color:var(--amber);}
   .b-early{background:var(--red-soft);color:#B23B54;}
@@ -1312,6 +1316,17 @@ function fmtHM(mins){
   return h+' soat '+(m ? m+' daqiqa' : '');
 }
 
+// Davomat jadvalida "Kech qoldi"/"Erta ketdi" belgisi yoniga chiqadigan
+// qisqa daqiqa yorlig'i uchun - soat 60 dan oshsagina "N soat M daqiqa",
+// aks holda shunchaki "N daqiqa" ko'rsatadi (fmtHM'dagi "0 soat" chiqib
+// qolmasligi uchun).
+function fmtLateMin(mins){
+  if (!mins || mins <= 0) return '';
+  var h = Math.floor(mins/60), m = mins%60;
+  if (h > 0) return h+' soat'+(m ? ' '+m+' daqiqa' : '');
+  return mins+' daqiqa';
+}
+
 // ---------------- Filial / bo'lim ro'yxatlari ----------------
 var FILIALS = Array.from(new Set(EMP.map(function(e){ return e.filial; }).filter(Boolean))).sort();
 var BOLIMS = Array.from(new Set(EMP.map(function(e){ return e.bolim; }).filter(Boolean))).sort();
@@ -1922,10 +1937,14 @@ function renderDavomatTable(){
     var e = x.e, d = x.d;
     var arr = (typeof d.arrival==='string' && /\d/.test(d.arrival)) ? d.arrival : '\u2014';
     var dep = (typeof d.departure==='string' && /\d/.test(d.departure)) ? d.departure : '\u2014';
+    var minParts = [];
+    if ((d.status==='late' || d.status==='late_early') && d.late_min > 0) minParts.push(fmtLateMin(d.late_min)+' kech');
+    if ((d.status==='early' || d.status==='late_early') && d.early_min > 0) minParts.push(fmtLateMin(d.early_min)+' erta');
+    var minTag = minParts.length ? '<span class="late-min-tag">'+minParts.join(' \u00b7 ')+'</span>' : '';
     return '<tr data-fio="'+encodeURIComponent(e.fio)+'">'+
       '<td><div class="who">'+avatarHTML(e.fio)+'<div><div class="name">'+e.fio+'</div><div class="sub">'+(e.sched_start||'')+' - '+(e.sched_end||'')+'</div></div></div></td>'+
       '<td>'+arr+'</td><td>'+dep+'</td>'+
-      '<td><span class="badge '+STATUS_BADGE_CLASS[d.status]+'"><span class="dot" style="background:'+STATUS_DOT[d.status]+'"></span>'+STATUS_LABEL[d.status]+'</span></td>'+
+      '<td><span class="badge '+STATUS_BADGE_CLASS[d.status]+'"><span class="dot" style="background:'+STATUS_DOT[d.status]+'"></span>'+STATUS_LABEL[d.status]+'</span>'+minTag+'</td>'+
       '</tr>';
   }).join('') || '<tr><td colspan="4"><div class="empty-state">Hech narsa topilmadi</div></td></tr>';
   document.getElementById('davomatTbody').innerHTML = html;
