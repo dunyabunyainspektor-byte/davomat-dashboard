@@ -1317,14 +1317,13 @@ function fmtHM(mins){
 }
 
 // Davomat jadvalida "Kech qoldi"/"Erta ketdi" belgisi yoniga chiqadigan
-// qisqa daqiqa yorlig'i uchun - soat 60 dan oshsagina "N soat M daqiqa",
-// aks holda shunchaki "N daqiqa" ko'rsatadi (fmtHM'dagi "0 soat" chiqib
-// qolmasligi uchun).
+// qisqa daqiqa yorlig'i uchun - QISQA (qisqartirilgan) shaklda: soat 60
+// dan oshsagina "Ns Md", aks holda shunchaki "Nd" ko'rsatadi - jadvalda
+// qatorlar uzun bo'lib ketmasligi uchun.
 function fmtLateMin(mins){
   if (!mins || mins <= 0) return '';
   var h = Math.floor(mins/60), m = mins%60;
-  if (h > 0) return h+' soat'+(m ? ' '+m+' daqiqa' : '');
-  return mins+' daqiqa';
+  return h > 0 ? (h+'s '+m+'d') : (mins+'d');
 }
 
 // ---------------- Filial / bo'lim ro'yxatlari ----------------
@@ -1937,9 +1936,15 @@ function renderDavomatTable(){
     var e = x.e, d = x.d;
     var arr = (typeof d.arrival==='string' && /\d/.test(d.arrival)) ? d.arrival : '\u2014';
     var dep = (typeof d.departure==='string' && /\d/.test(d.departure)) ? d.departure : '\u2014';
+    // Yakka holatda (faqat kech YOKI faqat erta) badge'ning o'zi ("Kech
+    // qoldi"/"Erta ketdi") ma'noni ochiq ko'rsatib turgani uchun daqiqa
+    // yorlig'iga qo'shimcha so'z shart emas - shunchaki "2s 47d". Faqat
+    // ikkalasi ham bo'lgan (late_early) kunda, adashtirmaslik uchun K:/E:
+    // qisqa belgisi qo'shiladi.
+    var isBoth = (d.status === 'late_early');
     var minParts = [];
-    if ((d.status==='late' || d.status==='late_early') && d.late_min > 0) minParts.push(fmtLateMin(d.late_min)+' kech');
-    if ((d.status==='early' || d.status==='late_early') && d.early_min > 0) minParts.push(fmtLateMin(d.early_min)+' erta');
+    if ((d.status==='late' || isBoth) && d.late_min > 0) minParts.push((isBoth ? 'K:' : '') + fmtLateMin(d.late_min));
+    if ((d.status==='early' || isBoth) && d.early_min > 0) minParts.push((isBoth ? 'E:' : '') + fmtLateMin(d.early_min));
     var minTag = minParts.length ? '<span class="late-min-tag">'+minParts.join(' \u00b7 ')+'</span>' : '';
     return '<tr data-fio="'+encodeURIComponent(e.fio)+'">'+
       '<td><div class="who">'+avatarHTML(e.fio)+'<div><div class="name">'+e.fio+'</div><div class="sub">'+(e.sched_start||'')+' - '+(e.sched_end||'')+'</div></div></div></td>'+
