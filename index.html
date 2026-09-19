@@ -1142,7 +1142,16 @@ function fmtMoney(n){
 }
 function confirmedOntimeDays(e){
   if (e.bonus_exempt) return 0;
-  return e.days.filter(function(d){ return d.status==='ontime' && !d.ongoing && !d.incomplete; }).length;
+  // DIQQAT: bonus kunlari soni backend (davomat_yangilash.py)dagi haqiqiy
+  // bonus ro'yxatidan (e.bonus.days) olinishi SHART, status==='ontime'
+  // bo'yicha bu yerda QAYTA hisoblab bo'lmaydi - chunki rasmiy dam olish/
+  // bayram kunida ixtiyoriy ishlagan kun backendda ALOHIDA status
+  // ('holiday_worked') bilan belgilanadi, lekin baribir bonusga tushadi
+  // (backenddagi voluntary_ontime mantig'i). Avval shu yerda status
+  // bo'yicha qayta hisoblanganda bunday kunlar bonus ro'yxatida (pastdagi
+  // "Davomat bonusi" chiplarida) ko'rinib turib, lekin "Jami bonus (N kun)"
+  // sonidan va summasidan TUSHIB QOLAR edi (N bitta kam chiqardi).
+  return e.bonus.days.length;
 }
 function initials(fio){
   var parts = fio.trim().split(/\s+/);
