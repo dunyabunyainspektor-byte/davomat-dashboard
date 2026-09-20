@@ -2067,7 +2067,7 @@ function renderBonusView(){
     if (faceidCount) lossCellParts.push('<div><span class="badge b-lateearly">'+faceidCount+' kun</span> <span style="color:var(--red);font-weight:700;white-space:nowrap;" title="FaceID belgisi qoldirilmagani sabab">\u2212'+fmtMoney(faceidLoss)+'</span></div>');
     if (excursionCount) lossCellParts.push('<div><span class="badge b-lateearly">'+excursionCount+' kun</span> <span style="color:var(--red);font-weight:700;white-space:nowrap;" title="Ish vaqtida tashqariga chiqib ketgani sabab">\u2212'+fmtMoney(excursionLoss)+'</span></div>');
     return '<tr data-fio="'+encodeURIComponent(e.fio)+'">'+
-      '<td><div class="who">'+avatarHTML(e.fio)+'<div class="name">'+e.fio+'</div></div></td>'+
+      '<td><div class="who">'+avatarHTML(e.fio)+'<div><div class="name">'+e.fio+'</div>'+(e.bonus_exempt ? '<div style="font-size:11px;color:var(--red);font-weight:700;">🚫 Bonus qoʻllanilmaydi</div>' : '')+'</div></div></td>'+
       '<td>'+confirmedOntimeDays(e)+' kun</td>'+
       '<td class="money'+(gross===0?' zero':'')+'">'+fmtMoney(gross)+'</td>'+
       '<td>'+(lossCellParts.length ? lossCellParts.join('') : '\u2014')+'</td>'+
@@ -3408,9 +3408,12 @@ function openEmployee(fio){
     '<div class="panel"><div class="cal-grid">'+cells+'</div></div>'+
     '<div class="bonus-strip">'+
       '<h3 style="margin:0 0 6px;">Davomat bonusi</h3>'+
-      '<div class="sub" style="color:var(--muted);font-size:12.5px;">Har kuni vaqtida kelib, erta ketmasa va FaceID belgisi bo\u02bblsa \u2014 '+BONUS_PER_DAY.toLocaleString('ru-RU')+" so'm hisoblanadi.</div>"+
-      '<div class="bonus-days">'+(bonusDaysHTML || '<span class="sub" style="color:var(--muted);">Bu davrda bonusli kun yo\u02bbq.</span>')+'</div>'+
-      '<div class="mini-stat-line"><span class="l">Jami bonus ('+confirmedOntimeDays(e)+' kun \u00d7 '+BONUS_PER_DAY.toLocaleString('ru-RU')+')</span><span class="v">'+fmtMoney(grossBonus)+'</span></div>'+
+      (e.bonus_exempt
+        ? '<div class="sub" style="color:var(--red);font-size:12.5px;background:var(--red-soft, #FDECEC);border-radius:8px;padding:8px 10px;font-weight:600;">\ud83d\udeab Bu xodimga davomat bonusi tizimi UMUMAN qo\u02bbllanilmaydi \u2014 kelish-ketish vaqtidan qat\u02bbi nazar (hech qachon) bonus hisoblanmaydi.</div>'
+        : ('<div class="sub" style="color:var(--muted);font-size:12.5px;">Har kuni vaqtida kelib, erta ketmasa va FaceID belgisi bo\u02bblsa \u2014 '+BONUS_PER_DAY.toLocaleString('ru-RU')+" so'm hisoblanadi.</div>"+
+          '<div class="bonus-days">'+(bonusDaysHTML || '<span class="sub" style="color:var(--muted);">Bu davrda bonusli kun yo\u02bbq.</span>')+'</div>'+
+          '<div class="mini-stat-line"><span class="l">Jami bonus ('+confirmedOntimeDays(e)+' kun \u00d7 '+BONUS_PER_DAY.toLocaleString('ru-RU')+')</span><span class="v">'+fmtMoney(grossBonus)+'</span></div>')
+      )+
       (faceidLossAmt ? '<div class="mini-stat-line"><span class="l">FaceID sababli yo\u02bbqotilgan ('+e.bonus.cancelled_faceid.length+' kun)</span><span class="v warn">\u2212'+fmtMoney(faceidLossAmt)+'</span></div>' : '')+
       (excursionLossAmt ? '<div class="mini-stat-line"><span class="l">Ish vaqtida tashqariga chiqib ketgani sababli yo\u02bbqotilgan ('+e.bonus.excursion_cancelled.length+' kun)</span><span class="v warn">\u2212'+fmtMoney(excursionLossAmt)+'</span></div>' : '')+
       (jarimaCutAmt ? '<div class="mini-stat-line"><span class="l">Jarima kesimi ('+extractBonusCutPct(jAction)+'%)</span><span class="v warn">\u2212'+fmtMoney(jarimaCutAmt)+'</span></div>' : '')+
