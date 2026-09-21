@@ -1529,6 +1529,19 @@ function bindChipClicks(container){
   });
 }
 
+function pendingFaceidListHTML(list){
+  if (!list.length){
+    return '<div class="empty-state" style="padding:8px 0 4px;font-size:11.5px;color:var(--green);">Hammasi toʻgʻirlangan ✅</div>';
+  }
+  return '<div style="padding-top:4px;padding-bottom:2px;">' + list.map(function(item){
+    var datesStr = item.dates.map(fmtDateLabel).join(', ');
+    return '<div class="mini-stat-line" data-fio="'+encodeURIComponent(item.e.fio)+'" style="cursor:pointer;padding:7px 0;">'+
+      '<span class="l" style="display:flex;align-items:center;gap:8px;font-weight:600;">'+avatarHTML(item.e.fio).replace('avatar"','avatar" style="width:22px;height:22px;font-size:8.5px;background:'+colorFor(item.e.fio)+'"')+item.e.fio+'</span>'+
+      '<span class="v" style="font-size:11px;color:var(--red);font-weight:700;white-space:nowrap;">'+datesStr+'</span>'+
+      '</div>';
+  }).join('') + '</div>';
+}
+
 function renderBirthdayPanel(){
   var panel = document.getElementById('birthdayPanel');
   var listEl = document.getElementById('birthdayList');
@@ -1608,6 +1621,7 @@ function renderFaceidIntizomMiniPanel(){
   var emp = davomatFilteredEmp();
   var faceidMonthList = [], absentList = [], lateList = [], earlyList = [], ontimeList = [];
   var faceidMonthCount = 0, totalLate = 0, totalEarly = 0, totalOntime = 0, totalAbsent = 0;
+  var pendingList = [];
   emp.forEach(function(e){
     if (e.bonus.cancelled_faceid.length){ faceidMonthList.push(e); faceidMonthCount += e.bonus.cancelled_faceid.length; }
     var lateN = e.stats.late + e.stats.late_early;
@@ -1617,24 +1631,40 @@ function renderFaceidIntizomMiniPanel(){
     if (earlyN) { earlyList.push(e); totalEarly += earlyN; }
     if (ontimeN) { ontimeList.push(e); totalOntime += ontimeN; }
     if (e.stats.notyet) { absentList.push(e); totalAbsent += e.stats.notyet; }
+    // "Hali to'g'irlanmagan" - Verifix'da chiqish belgisi haqiqatan yo'q VA
+    // FACE_ID_QILINMAGAN.xlsx'da bu kun uchun hali HECH QANDAY yozuv (izoh ham)
+    // kiritilmagan bo'lsa - demak HR bu holatni hali ko'rib chiqmagan/hujjatlashtirmagan.
+    // HR Excel'ga qator qo'shgani sari bu ro'yxat qisqarib, oxir-oqibat 0'ga tushadi.
+    var pendingDates = [];
+    (e.days || []).forEach(function(d){
+      if (d.departure_missing && !d.faceid_note) pendingDates.push(d.date);
+    });
+    if (pendingDates.length) pendingList.push({e:e, dates:pendingDates});
   });
   lateList.sort(function(a,b){ return (b.stats.late+b.stats.late_early)-(a.stats.late+a.stats.late_early); });
   earlyList.sort(function(a,b){ return (b.stats.early+b.stats.late_early)-(a.stats.early+a.stats.late_early); });
   ontimeList.sort(function(a,b){ return (b.stats.ontime+b.stats.early)-(a.stats.ontime+a.stats.early); });
   absentList.sort(function(a,b){ return b.stats.notyet-a.stats.notyet; });
   faceidMonthList.sort(function(a,b){ return b.bonus.cancelled_faceid.length-a.bonus.cancelled_faceid.length; });
+  pendingList.sort(function(a,b){ return b.dates.length-a.dates.length; });
 
   var rows = [
     {key:'fid_emp', label:'Joriy oyda FaceID belgisi yo\u02bbq (xodim)', val:faceidMonthList.length, warn:!!faceidMonthList.length, nav:'bonus', focus:'faceidMonth'},
     {key:'fid_month', label:'Shu oy FaceID sababli bekor (kun)', val:faceidMonthCount, warn:!!faceidMonthCount, nav:'bonus', focus:'faceidMonth'},
+    {key:'fid_pending', label:'Hali to\u02bbg\u02bbirlanmagan (FaceID)', val:pendingList.length, warn:!!pendingList.length, nav:'expand'},
     {key:'absent', label:'Jami ishga kelmaslik (kun)', val:totalAbsent, warn:!!totalAbsent, nav:'intizom', focus:'absent', sortKey:'absent'},
     {key:'late', label:'Jami kech qolish (kun)', val:totalLate, nav:'intizom', focus:'late', sortKey:'late'},
     {key:'early', label:'Jami erta ketish (kun)', val:totalEarly, nav:'intizom', focus:'early', sortKey:'early'},
     {key:'ontime', label:'Jami vaqtida kelish (kun)', val:totalOntime, green:true, nav:'intizom', focus:'ontime', sortKey:'ontime'}
   ];
   var html = rows.map(function(r){
-    return '<div class="mini-stat-line mini-clickable" data-row-key="'+r.key+'"><span class="l">'+r.label+'</span>'+
+    var isExpand = r.nav === 'expand';
+    var expanded = isExpand && !!miniExpandState[r.key];
+    var arrow = isExpand ? ' <span style="font-size:9px;color:var(--muted);">'+(expanded?'\u25b2':'\u25bc')+'</span>' : '';
+    var line = '<div class="mini-stat-line mini-clickable" data-row-key="'+r.key+'"><span class="l">'+r.label+arrow+'</span>'+
       '<span class="v'+(r.warn?' warn':'')+'"'+(r.green?' style="color:var(--green)"':'')+'>'+r.val+'</span></div>';
+    if (isExpand && expanded) line += pendingFaceidListHTML(pendingList);
+    return line;
   }).join('');
   el.innerHTML = html;
   Array.prototype.forEach.call(el.querySelectorAll('[data-row-key]'), function(rowEl){
@@ -1651,9 +1681,13 @@ function renderFaceidIntizomMiniPanel(){
         copyFilterTo('intizomFilialSel', 'intizomBolimSel');
         if (currentView !== 'intizom') empReturnView = currentView;
         switchView('intizom');
+      } else if (r.nav === 'expand'){
+        miniExpandState[r.key] = !miniExpandState[r.key];
+        renderFaceidIntizomMiniPanel();
       }
     });
   });
+  bindChipClicks(el);
 }
 
 var trendVisible = {ontime:true, late:true, notyet:false, tatil:false};
