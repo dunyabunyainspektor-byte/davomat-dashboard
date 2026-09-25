@@ -1046,9 +1046,16 @@ function renderOverview(){
 }
 
 /* ---------------- Render: Managers / KPI ---------------- */
+function currentMonthPrefix(){
+  const t = new Date();
+  return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0');
+}
 function renderManagers(){
-  // Uses FULL dataset (bonus reflects real performance, independent of filters)
-  const byMgr = aggregateByManager(RAW_ORDERS).sort((a,b)=>b.total-a.total);
+  // Faqat JORIY OY ma'lumotlari (filtrlardan mustaqil) — bonus shu oyning
+  // haqiqiy savdosiga asoslanadi, eski oylar aralashmasligi kerak.
+  const mp = currentMonthPrefix();
+  const monthOrders = RAW_ORDERS.filter(o=>o.dkey && o.dkey.slice(0,7)===mp);
+  const byMgr = aggregateByManager(monthOrders).sort((a,b)=>b.total-a.total);
   const PAY_BONUS_THRESHOLD = 90;
   const html = byMgr.map((m,i)=>{
     const bonusSale = m.total*BONUS_RATE;
@@ -1065,7 +1072,7 @@ function renderManagers(){
     const payStatusHtml = payEligible
       ? `<span class="badge badge-green">✓ 90%+ — bonus hisoblandi</span>`
       : `<span class="badge badge-amber">Kutilmoqda — 15-sanagacha imkoniyat bor</span>`;
-    const posTotal = RAW_ORDERS.filter(o=>o.manager===m.manager && o.source==='pos').reduce((s,o)=>s+o.total,0);
+    const posTotal = monthOrders.filter(o=>o.manager===m.manager && o.source==='pos').reduce((s,o)=>s+o.total,0);
     const posNote = posTotal>0
       ? `<div class="pos-note"><b>POS kassa savdosi:</b> ${fmtSum(posTotal)} shu menejerning umumiy sotilgan va to'langan summasiga qo'shib hisoblangan (Hasanboy filial POS_1).</div>`
       : '';
