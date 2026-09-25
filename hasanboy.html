@@ -1055,7 +1055,7 @@ function renderManagers(){
   // haqiqiy savdosiga asoslanadi, eski oylar aralashmasligi kerak.
   const mp = currentMonthPrefix();
   const monthOrders = RAW_ORDERS.filter(o=>o.dkey && o.dkey.slice(0,7)===mp);
-  const byMgr = aggregateByManager(monthOrders).filter(m=>m.total>0).sort((a,b)=>b.total-a.total);
+  const byMgr = aggregateByManager(monthOrders).sort((a,b)=>b.total-a.total);
   const PAY_BONUS_THRESHOLD = 90;
   const html = byMgr.map((m,i)=>{
     const bonusSale = m.total*BONUS_RATE;
@@ -1095,9 +1095,9 @@ function renderManagers(){
       </div>
       ${!payEligible ? `<div style="text-align:right; margin-top:2px;"><span class="muted" style="font-size:11px;">90%ga yetish uchun yana kerak: <b class="mono" style="color:var(--red); font-weight:600;">${fmtSum(amountNeeded)}</b></span></div>` : ''}
       <div class="mgr-stats">
-        <div><div class="mgr-stat-label">Sotilgan summa</div><div class="mgr-stat-value">${fmtSumShort(m.total)}</div></div>
-        <div><div class="mgr-stat-label">To'langan summa</div><div class="mgr-stat-value" style="color:var(--green)">${fmtSumShort(m.paid)}</div></div>
-        <div><div class="mgr-stat-label">To'lanmagan</div><div class="mgr-stat-value" style="color:var(--red)">${fmtSumShort(m.unpaid)}</div></div>
+        <div><div class="mgr-stat-label">Sotilgan summa</div><div class="mgr-stat-value">${fmtSum(m.total)}</div></div>
+        <div><div class="mgr-stat-label">To'langan summa</div><div class="mgr-stat-value" style="color:var(--green)">${fmtSum(m.paid)}</div></div>
+        <div><div class="mgr-stat-label">To'lanmagan</div><div class="mgr-stat-value" style="color:var(--red)">${fmtSum(m.unpaid)}</div></div>
         <div><div class="mgr-stat-label">Savdo bonusi (0,1%)</div><div class="mgr-stat-value" style="color:var(--gold)">${fmtSumShort(bonusSale)}</div></div>
         <div>
           <div class="mgr-stat-label">To'lov bonusi (0,1%)</div>
