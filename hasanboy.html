@@ -869,6 +869,21 @@ function setupDateField(txtId, btnId, calId, filterKey){
 const dateFromField = setupDateField('f-date-from-txt','f-date-from-btn','f-date-from-cal','dateFrom');
 const dateToField = setupDateField('f-date-to-txt','f-date-to-btn','f-date-to-cal','dateTo');
 
+/* Dashboard ochilganda avtomatik joriy oy (1-sanadan bugungacha) ko'rsatilsin */
+(function applyDefaultCurrentMonth(){
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  const y = now.getFullYear(), m = now.getMonth(), d = now.getDate();
+  const firstIso = `${y}-${pad(m+1)}-01`;
+  const todayIso = `${y}-${pad(m+1)}-${pad(d)}`;
+  filters.dateFrom = firstIso;
+  filters.dateTo = todayIso;
+  const fromTxt = document.getElementById('f-date-from-txt');
+  const toTxt = document.getElementById('f-date-to-txt');
+  if(fromTxt) fromTxt.value = isoToUz(firstIso);
+  if(toTxt) toTxt.value = isoToUz(todayIso);
+})();
+
 
 document.getElementById('resetFilters').addEventListener('click', ()=>{
   filters.manager=''; filters.source=''; filters.baj=''; filters.chiq=''; filters.pay=''; filters.pul=''; filters.search=''; filters.dateFrom=''; filters.dateTo='';
