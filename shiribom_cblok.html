@@ -863,7 +863,7 @@ function aggregateByPicker(docs){
 
 // ---------- rank change (compared against last known snapshot) ----------
 // Snapshot = each picker's cumulative total pozitsiya as of the previous dashboard refresh.
-const PREV_SNAPSHOT = {"SHOALIMOV SHOBILOL O‘KTAMJON O‘G‘LI": 9247, "MANNOPOV BEKZOD RUSTAM O‘G‘LI": 3244, "KARIMOV ABDURAHMON ODILJON O‘G‘LI": 1255, "OBIDOV MAHMUDJON MURODJON O‘G‘LI": 6817, "SULTANMAXMUDOV AXMADJON SOBIT O‘G‘LI": 3273, "MUSLIMOV OZODBEK SHUXRAT O‘G‘LI": 476};
+const PREV_SNAPSHOT = {"SHOALIMOV SHOBILOL O‘KTAMJON O‘G‘LI": 9247, "MANNOPOV BEKZOD RUSTAM O‘G‘LI": 3253, "KARIMOV ABDURAHMON ODILJON O‘G‘LI": 1255, "OBIDOV MAHMUDJON MURODJON O‘G‘LI": 6817, "SULTANMAXMUDOV AXMADJON SOBIT O‘G‘LI": 3273, "MUSLIMOV OZODBEK SHUXRAT O‘G‘LI": 476};
 const ALL_DATES = [...new Set(RAW_DOCS.map(d=>d.dkey))].filter(k=>k!=='noma-lum').sort();
 const TODAY_KEY = ALL_DATES[ALL_DATES.length-1];
 const totalsAllTime = aggregateByPicker(RAW_DOCS).sort((a,b)=>b.positions-a.positions);
