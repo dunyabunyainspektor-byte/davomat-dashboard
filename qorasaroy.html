@@ -475,7 +475,8 @@ const MANAGERS = [...new Set(RAW_ORDERS.map(o=>o.manager))].sort();
 const PAY_STATUSES = [...new Set(RAW_ORDERS.map(o=>o.pay_status).filter(Boolean))];
 
 // Boshqa filialdan o'tgan menejerlar haqida izoh (kartochkada ko'rsatiladi)
-const MANAGER_NOTES = {"RIXSIYEV ABDULLOX RAXMATULLA O‘G‘LI": "06.10.2026 dan Hasanboy filialidan Qorasaroy filialiga oʻtgan — bu yerda faqat 06.10.2026 dan boshlab qilgan savdosi hisoblanadi (oldingi savdolari Hasanboy filialida qoladi)."};
+const MANAGER_NOTES = {"RIXSIYEV ABDULLOX RAXMATULLA O‘G‘LI": "06.10.2026 dan Hasanboy filialidan Qorasaroy filialiga oʻtgan — bu yerda faqat 06.10.2026 dan boshlab qilgan savdosi hisoblanadi (oldingi savdolari Hasanboy filialida qoladi).",
+  "RAXIMOV KAMRONBEK SHUXRAT O‘G‘LI": "Qorasaroy Chakana filialidagi savdo davri 13.10.2026 dan boshlangan — bu yerda faqat 13.10.2026 dan boshlab qilgan savdosi hisoblanadi (oldingi savdolari Qorasaroy Online hisobiga o'tkazilgan)."};
 // Ishdan bo'shagan sotuvchilar: shu kishilar uchun buyurtma bo'lmagan
 // davrlarda (masalan joriy oy) "0" qiymatli bo'sh karta sifatida majburan
 // ko'rsatilmaydi (aggregateByManager'dagi oldindan-urug'lash bosqichida
