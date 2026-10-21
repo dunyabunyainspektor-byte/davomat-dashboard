@@ -320,7 +320,7 @@
   </nav>
   <div class="sidebar-foot">
     Manba: <b>Заказ на продажу — sale order</b><br>
-    Davr: <b>Avgust 2026</b><br>
+    Davr: <b id="davrLabel">Avgust 2026</b><br>
     Har kuni yangi fayl bilan yangilanadi.
   </div>
 </aside>
@@ -701,6 +701,7 @@ function applyMonth(y,m){
   const { from, to } = monthBounds(y,m);
   filters.dateFrom = from; filters.dateTo = to;
   monthLabelEl.textContent = `${MONTHS_UZ_FULL[m]} ${y}`;
+  const _dl = document.getElementById('davrLabel'); if(_dl) _dl.textContent = `${MONTHS_UZ_FULL[m]} ${y}`;
   monthNextBtn.disabled = (y===CURRENT_Y && m===CURRENT_M);
   renderAll();
 }
@@ -809,10 +810,20 @@ function aggregateByManager(orders){
 const MANAGER_COLORS = ['#d4af37', '#3ecf8e', '#6fa8dc', '#e8a944', '#ef6a6a', '#b98fd4', '#5fc9c9', '#e08ab0'];
 function colorForManager(idx){ return MANAGER_COLORS[idx % MANAGER_COLORS.length]; }
 
+// Tanlangan oy (sana filtri) bo'yicha buyurtmalar: KPI/reja bo'limlari faqat shu oyni hisoblaydi.
+function monthOrdersOnly(){
+  return RAW_ORDERS.filter(o=>{
+    if(filters.dateFrom && o.dkey < filters.dateFrom) return false;
+    if(filters.dateTo && o.dkey > filters.dateTo) return false;
+    return true;
+  });
+}
+
 function renderOverallPlanCard(){
-  // Uses FULL dataset (independent of filters), like the Managers/KPI bonus panel.
+  // Faqat tanlangan OY bo'yicha (sana filtri); boshqa filtrlar ta'sir qilmaydi.
+  const _mo = monthOrdersOnly();
   const totalPlan = MANAGERS.reduce((s,m)=>s+planFor(m),0);
-  const byMgr = aggregateByManager(RAW_ORDERS).sort((a,b)=>b.total-a.total);
+  const byMgr = aggregateByManager(_mo).sort((a,b)=>b.total-a.total);
   const totalSales = byMgr.reduce((s,m)=>s+m.total,0);
   const totalPaid = byMgr.reduce((s,m)=>s+m.paid,0);
   const planPct = totalPlan>0 ? (totalSales/totalPlan*100) : 0;
@@ -833,9 +844,9 @@ function renderOverallPlanCard(){
     <div class="mgr-head">
       <div class="mgr-name-block">
         <span class="mgr-name">Umumiy reja bajarilishi</span>
-        <span class="mgr-name-sub">Barcha menejerlar bo'yicha jami, filtrlardan mustaqil</span>
+        <span class="mgr-name-sub">Barcha menejerlar bo'yicha jami, tanlangan oy uchun</span>
       </div>
-      <span class="badge badge-gold">${fmtNum(RAW_ORDERS.length)} ta buyurtma</span>
+      <span class="badge badge-gold">${fmtNum(_mo.length)} ta buyurtma</span>
     </div>
     <div class="plan-row">
       <span class="mono muted" style="font-size:11.5px; min-width:64px;">Reja</span>
@@ -950,8 +961,8 @@ function chakanaNote(mgr){
 }
 
 function renderManagers(){
-  // Uses FULL dataset (bonus reflects real performance, independent of filters)
-  const _ckRaw = ckKept(RAW_ORDERS);
+  // Faqat tanlangan OY (sana filtri) bo'yicha; boshqa filtrlar ta'sir qilmaydi.
+  const _ckRaw = ckKept(monthOrdersOnly());
   const byMgr = aggregateByManager(_ckRaw).sort((a,b)=>b.total-a.total);
   const html = byMgr.map((m,i)=>{
     const plan = planFor(m.manager);
