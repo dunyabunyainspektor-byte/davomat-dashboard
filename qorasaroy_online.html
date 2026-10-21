@@ -1010,10 +1010,10 @@ function renderOverview(){
     <span class="plan-legend-item"><span class="plan-legend-dot" style="background:${PLAN_COLORS[i%PLAN_COLORS.length]};"></span>${m.manager.split(' ').slice(0,2).join(' ')} — <b>${fmtSumShort(m.total)}</b></span>
   `).join('');
   document.getElementById('planStatsRow').innerHTML = `
-    <div><div class="mgr-stat-label">Umumiy reja</div><div class="mgr-stat-value">${fmtSumShort(totalPlan)}</div></div>
-    <div><div class="mgr-stat-label">Sotilgan summa</div><div class="mgr-stat-value" style="color:var(--gold)">${fmtSumShort(totalSoldAll)}</div></div>
-    <div><div class="mgr-stat-label">To'langan summa</div><div class="mgr-stat-value" style="color:var(--green)">${fmtSumShort(totalPaidAll)}</div></div>
-    <div><div class="mgr-stat-label">Rejagacha qolgan</div><div class="mgr-stat-value" style="color:var(--red)">${fmtSumShort(remaining)}</div></div>
+    <div><div class="mgr-stat-label">Umumiy reja</div><div class="mgr-stat-value">${fmtSum(totalPlan)}</div></div>
+    <div><div class="mgr-stat-label">Sotilgan summa</div><div class="mgr-stat-value" style="color:var(--gold)">${fmtSum(totalSoldAll)}</div></div>
+    <div><div class="mgr-stat-label">To'langan summa</div><div class="mgr-stat-value" style="color:var(--green)">${fmtSum(totalPaidAll)}</div></div>
+    <div><div class="mgr-stat-label">Rejagacha qolgan</div><div class="mgr-stat-value" style="color:var(--red)">${fmtSum(remaining)}</div></div>
   `;
 
   const orders = getFiltered();
