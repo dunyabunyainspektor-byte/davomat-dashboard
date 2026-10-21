@@ -703,7 +703,7 @@ function aggregateByClient(orders){
 // "Menejerlar & KPI" ro'yxatida ko'rsatilmaydi (Umumiy holatdagi zakazlar o'zgarmaydi).
 const MANAGER_ACTIVE_UNTIL = { "RAXIMOV KAMRONBEK SHUXRAT O\u2018G\u2018LI": "2026-08-31" };
 // Boshqa filialdan kelgan menejerlar: ishlay boshlagan sanadan oldingi oylarda ko'rsatilmaydi.
-const MANAGER_ACTIVE_FROM = { "RAIMOVA ZUMRAD ULUGBEK QIZI": "2026-09-01" };
+const MANAGER_ACTIVE_FROM = { "ERKINOV MURODBEK TO\u2018LQINJON O\u2018G\u2018LI": "2026-10-01", "RAIMOVA ZUMRAD ULUGBEK QIZI": "2026-09-01" };
 function managerActiveInPeriod(m){
   const until = MANAGER_ACTIVE_UNTIL[m];
   if(until && filters.dateFrom && filters.dateFrom > until) return false;
@@ -796,7 +796,7 @@ function renderOverview(){
 // bonusiga HISOBLANMAYDI, lekin kartochkada alohida ko'rsatiladi.
 const CHAKANA_MIJOZLAR = ["QORASAROY CHAKANA","HASANBOY CHAKANA","SHIRIBOM CHAKANA"];
 // Boshqa filialdan o'tgan menejerlar haqida izoh (kartochkada ko'rsatiladi)
-const TRANSFER_NOTES = {"RAXIMOV KAMRONBEK SHUXRAT O\u2018G\u2018LI": "01.09.2026 dan Shiribom Chakana filialidan chiqib ketgan — bu filialdagi savdosi 31.08.2026 gacha hisoblanadi (sentabr va oktyabr oylarida ro'yxatda ko'rsatilmaydi). 13.10.2026 dan Qorasaroy Chakana filialida ishlaydi.", "RAIMOVA ZUMRAD ULUGBEK QIZI": "01.09.2026 dan Shiribom Online filialidan Shiribom Chakana filialiga o'tgan — bu yerda 01.09.2026 dan boshlab qilgan savdosi hisoblanadi (oldingi savdolari Shiribom Online filialida qoladi)."};
+const TRANSFER_NOTES = {"ERKINOV MURODBEK TO\u2018LQINJON O\u2018G\u2018LI": "01.10.2026 dan Qorasaroy Online filialidan Shiribom Chakana filialiga o'tgan — bu yerda 01.10.2026 dan boshlab qilgan savdosi hisoblanadi (oldingi savdolari Qorasaroy Online filialida qoladi).", "RAXIMOV KAMRONBEK SHUXRAT O\u2018G\u2018LI": "01.09.2026 dan Shiribom Chakana filialidan chiqib ketgan — bu filialdagi savdosi 31.08.2026 gacha hisoblanadi (sentabr va oktyabr oylarida ro'yxatda ko'rsatilmaydi). 13.10.2026 dan Qorasaroy Chakana filialida ishlaydi.", "RAIMOVA ZUMRAD ULUGBEK QIZI": "01.09.2026 dan Shiribom Online filialidan Shiribom Chakana filialiga o'tgan — bu yerda 01.09.2026 dan boshlab qilgan savdosi hisoblanadi (oldingi savdolari Shiribom Online filialida qoladi)."};
 const OUT_NOTES = {"RAXIMOV KAMRONBEK SHUXRAT O‘G‘LI": {"count": 63, "sum": 156059167.12, "d1": "2026-10-02", "d2": "2026-10-12", "to": "MAMARAXIMOV IZZATILLA XIKMATILLA O‘G‘LI"}};
 function outNote(mgr){
   const n = OUT_NOTES[mgr];
