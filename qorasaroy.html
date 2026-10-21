@@ -840,11 +840,11 @@ function mgrTotalsHtml(rows, L){
   const card = (lab, big, sub, cls) => `<div class="kpi-card"><div class="kpi-label">${lab}</div><div class="kpi-value ${cls||''}">${big}</div><div class="kpi-sub">${sub}</div></div>`;
   return `<div class="panel" style="margin-bottom:20px;">
     <div class="panel-head"><h2>Umumiy natija</h2><span class="hint">${rows.length} ta ${L.who} bo'yicha yig'indi \u00b7 ${fmtNum(orders)} ta buyurtma</span></div>
-    <style>.mgr-tot-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}.mgr-tot-grid .kpi-card{padding:14px 14px}.mgr-tot-grid .kpi-label{font-size:10.5px;letter-spacing:0.5px;margin-bottom:8px}.mgr-tot-grid .kpi-value{font-size:19px}.mgr-tot-grid .kpi-sub{font-size:10.5px;word-break:break-word}@media(max-width:1100px){.mgr-tot-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:700px){.mgr-tot-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:420px){.mgr-tot-grid{grid-template-columns:1fr}}</style>
+    <style>.mgr-tot-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}.mgr-tot-grid .kpi-card{padding:14px 14px}.mgr-tot-grid .kpi-label{font-size:10.5px;letter-spacing:0.5px;margin-bottom:8px}.mgr-tot-grid .kpi-value{font-size:clamp(13px,1.15vw,19px);white-space:nowrap}.mgr-tot-grid .kpi-sub{font-size:10.5px;word-break:break-word}@media(max-width:1100px){.mgr-tot-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:700px){.mgr-tot-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:420px){.mgr-tot-grid{grid-template-columns:1fr}}</style>
     <div class="mgr-tot-grid">
-      ${card('Umumiy sotilgan', fmtSumShort(total), fmtSum(total), '')}
-      ${card("Umumiy to'langan", fmtSumShort(paid), fmtSum(paid) + ' \u00b7 ' + fmtPct(pct), 'green')}
-      ${card("Umumiy to'lanmagan", fmtSumShort(unpaid), fmtSum(unpaid), 'red')}
+      ${card('Umumiy sotilgan', fmtNum(total,0), "so'm", '')}
+      ${card("Umumiy to'langan", fmtNum(paid,0), "so'm \u00b7 " + fmtPct(pct), 'green')}
+      ${card("Umumiy to'lanmagan", fmtNum(unpaid,0), "so'm", 'red')}
       ${card(L.b1, fmtNum(b1,0), "so'm", 'gold')}
       ${card(L.b2, fmtNum(b2,0), "so'm", 'gold')}
       ${card(L.bt, fmtNum(bt,0), "so'm", 'gold')}
