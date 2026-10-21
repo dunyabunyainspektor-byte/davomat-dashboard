@@ -1023,7 +1023,7 @@ function renderManagers(){
         <div class="bar-track"><div class="bar-fill ${payBarClass}" style="width:${Math.min(paidPct,100)}%; position:relative;"></div></div>
         <span class="plan-pct" style="color:${payEligible?'#3ecf8e':'#ef6a6a'}">${fmtPct(paidPct)}</span>
       </div>
-      <div style="margin-top:10px;"><span style="display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:600; white-space:normal; line-height:1.4; background:${payEligible?'var(--green-soft)':'var(--amber-soft)'}; color:${payEligible?'var(--green)':'var(--amber)'};">${payEligible ? `✓ To'lov bonusi hisoblandi (${fmtPct(paidPct)})` : `To'lov ${fmtPct(paidPct)} — 90%ga yetmadi, yana ${fmtSum(payShortfall)} kerak (keyingi oy 15-sanasigacha imkoniyat bor)`}</span></div>
+      ${!payEligible ? `<div style="text-align:right; margin-top:2px;"><span class="muted" style="font-size:11px;">90%ga yetish uchun yana kerak: <b class="mono" style="color:var(--red); font-weight:600;">${fmtSum(payShortfall)}</b></span></div>` : ''}
       ${excludedAmount > 0 ? `<div style="margin-top:8px;"><span style="display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:600; white-space:normal; line-height:1.4; background:var(--red-soft); color:var(--red);">⚠ Jarima: ${excludedDateLabel} savdosi (${fmtSumShort(excludedAmount)}) bonus hisobiga kiritilmagan</span></div>` : ''}
       <div class="mgr-stats">
         <div><div class="mgr-stat-label">Oylik reja</div><div class="mgr-stat-value">${fmtSum(plan)}</div></div>
@@ -1031,7 +1031,11 @@ function renderManagers(){
         <div><div class="mgr-stat-label">To'langan summa</div><div class="mgr-stat-value" style="color:var(--green)">${fmtSum(m.paid)}</div></div>
         <div><div class="mgr-stat-label">To'lanmagan</div><div class="mgr-stat-value" style="color:var(--red)">${fmtSum(m.unpaid)}</div></div>
         <div><div class="mgr-stat-label">Savdo bonusi (0,1%)</div><div class="mgr-stat-value" style="color:var(--gold)">${fmtNum(bonusSale,0)}</div></div>
-        <div><div class="mgr-stat-label">To'lov bonusi (0,1%)</div><div class="mgr-stat-value" style="color:${payEligible?'var(--gold)':'var(--text-faint)'}">${fmtNum(bonusPay,0)}</div></div>
+        <div>
+          <div class="mgr-stat-label">To'lov bonusi (0,1%)</div>
+          <div class="mgr-stat-value" style="color:${payEligible?'var(--gold)':'var(--text-faint)'}">${fmtNum(bonusPay,0)}</div>
+          <div style="margin-top:4px;">${payEligible ? `<span class="badge badge-green">\u2713 90%+ \u2014 bonus hisoblandi</span>` : `<span class="badge badge-amber">Kutilmoqda \u2014 15-sanagacha imkoniyat bor</span>`}</div>
+        </div>
         <div><div class="mgr-stat-label">Jami bonus</div><div class="mgr-stat-value" style="color:var(--gold); font-size:17px;">${fmtSum(bonusTotal)}</div></div>
       </div>
       ${chakanaNote(m.manager)}
