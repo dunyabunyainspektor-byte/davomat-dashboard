@@ -795,9 +795,18 @@ function aggregateByClient(orders){
     return {...c, mainMgr};
   });
 }
+// Boshqa filialga o'tib ketgan menejerlar: ishlagan davri tugagan sanadan keyingi oylarda
+// ro'yxat, reja va grafiklarda umuman ko'rsatilmaydi (skriptdagi CHAKANAGA_OTGAN bilan mos).
+const MANAGER_ACTIVE_UNTIL = { "RAIMOVA ZUMRAD ULUGBEK QIZI": "2026-08-31" };
+function managerActiveInPeriod(m){
+  const until = MANAGER_ACTIVE_UNTIL[m];
+  if(!until) return true;
+  return !(filters.dateFrom && filters.dateFrom > until);
+}
+
 function aggregateByManager(orders){
   const map = new Map();
-  MANAGERS.forEach(m=>map.set(m,{manager:m, orders:0, total:0, paid:0, unpaid:0}));
+  MANAGERS.filter(managerActiveInPeriod).forEach(m=>map.set(m,{manager:m, orders:0, total:0, paid:0, unpaid:0}));
   orders.forEach(o=>{
     if(!map.has(o.manager)) map.set(o.manager, {manager:o.manager, orders:0, total:0, paid:0, unpaid:0});
     const m = map.get(o.manager);
@@ -822,7 +831,7 @@ function monthOrdersOnly(){
 function renderOverallPlanCard(){
   // Faqat tanlangan OY bo'yicha (sana filtri); boshqa filtrlar ta'sir qilmaydi.
   const _mo = monthOrdersOnly();
-  const totalPlan = MANAGERS.reduce((s,m)=>s+planFor(m),0);
+  const totalPlan = MANAGERS.filter(managerActiveInPeriod).reduce((s,m)=>s+planFor(m),0);
   const byMgr = aggregateByManager(_mo).sort((a,b)=>b.total-a.total);
   const totalSales = byMgr.reduce((s,m)=>s+m.total,0);
   const totalPaid = byMgr.reduce((s,m)=>s+m.paid,0);
