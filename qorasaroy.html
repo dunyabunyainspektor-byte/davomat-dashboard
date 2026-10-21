@@ -853,13 +853,13 @@ function renderManagers(){
       </div>
       ${!payEligible ? `<div style="text-align:right; margin-top:2px;"><span class="muted" style="font-size:11px;">90%ga yetish uchun yana kerak: <b class="mono" style="color:var(--red); font-weight:600;">${fmtSum(amountNeeded)}</b></span></div>` : ''}
       <div class="mgr-stats">
-        <div><div class="mgr-stat-label">Sotilgan summa</div><div class="mgr-stat-value">${fmtSumShort(m.total)}</div></div>
-        <div><div class="mgr-stat-label">To'langan summa</div><div class="mgr-stat-value" style="color:var(--green)">${fmtSumShort(m.paid)}</div></div>
-        <div><div class="mgr-stat-label">To'lanmagan</div><div class="mgr-stat-value" style="color:var(--red)">${fmtSumShort(m.unpaid)}</div></div>
-        <div><div class="mgr-stat-label">Savdo bonusi (0,1%)</div><div class="mgr-stat-value" style="color:var(--gold)">${fmtSumShort(bonusSale)}</div></div>
+        <div><div class="mgr-stat-label">Sotilgan summa</div><div class="mgr-stat-value">${fmtSum(m.total)}</div></div>
+        <div><div class="mgr-stat-label">To'langan summa</div><div class="mgr-stat-value" style="color:var(--green)">${fmtSum(m.paid)}</div></div>
+        <div><div class="mgr-stat-label">To'lanmagan</div><div class="mgr-stat-value" style="color:var(--red)">${fmtSum(m.unpaid)}</div></div>
+        <div><div class="mgr-stat-label">Savdo bonusi (0,1%)</div><div class="mgr-stat-value" style="color:var(--gold)">${fmtNum(bonusSale,0)}</div></div>
         <div>
           <div class="mgr-stat-label">To'lov bonusi (0,1%)</div>
-          <div class="mgr-stat-value" style="color:${payEligible?'var(--gold)':'var(--text-faint)'}">${fmtSumShort(bonusPay)}</div>
+          <div class="mgr-stat-value" style="color:${payEligible?'var(--gold)':'var(--text-faint)'}">${fmtNum(bonusPay,0)}</div>
           <div style="margin-top:4px;">${payStatusHtml}</div>
         </div>
         <div><div class="mgr-stat-label">Jami bonus</div><div class="mgr-stat-value" style="color:var(--gold); font-size:17px;">${fmtSum(bonusTotal)}</div></div>
