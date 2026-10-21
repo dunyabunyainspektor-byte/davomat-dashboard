@@ -1091,6 +1091,21 @@ function renderOverview(){
 // "Menejerlar/Sotuvchilar & KPI" bo'limida bunday zakazlar xodimning savdosi va
 // bonusiga HISOBLANMAYDI, lekin kartochkada alohida ko'rsatiladi.
 const CHAKANA_MIJOZLAR = ["QORASAROY CHAKANA","HASANBOY CHAKANA","SHIRIBOM CHAKANA"];
+// Boshqa sotuvchidan (masalan Chakanadan) shu menejer hisobiga o'tkazilgan zakazlar: skript to'ldiradi
+const REASSIGN_NOTES = {"MAMARAXIMOV IZZATILLA XIKMATILLA O‘G‘LI": [{"from": "RAXIMOV KAMRONBEK SHUXRAT O‘G‘LI", "refs": ["S89434", "S89485", "S89521", "S89660", "S89826", "S89962", "S89999", "S90232", "S90328", "S90346", "S90431", "S90832", "S90852", "S90975", "S91007", "S91011", "S91170", "S91586", "S91755", "S91801", "S91808", "S91871", "S91927", "S91969", "S92099", "S92107", "S92151", "S92267", "S92379", "S92441", "S92533", "S92580", "S92745", "S92897", "S92914", "S92931", "S92991", "S93059", "S93071", "S93098", "S93107", "S93196", "S93216", "S93278", "S93367", "S93448", "S93478", "S93504", "S93593", "S93622", "S93693", "S94304", "S94327", "S94331", "S94382", "S94476", "S94550", "S94568", "S94594", "S94674", "S94703", "S94704", "S94732"]}]};
+function reassignNote(mgr, orders){
+  const list = REASSIGN_NOTES[mgr];
+  if(!list || !list.length) return '';
+  const fd = d => d.slice(8,10)+'.'+d.slice(5,7)+'.'+d.slice(0,4);
+  return list.map(it=>{
+    const set = new Set(it.refs);
+    const sub = orders.filter(o=>set.has(o.ref));
+    if(!sub.length) return '';
+    const ds = sub.map(o=>String(o.date).slice(0,10)).sort();
+    const sum = sub.reduce((s,o)=>s+(o.total||0),0);
+    return `<div class="ck-note" style="background:rgba(111,168,220,0.10); border-color:rgba(111,168,220,0.35);"><b style="color:var(--blue, #6fa8dc);">Boshqa sotuvchidan qo'shilgan savdo:</b> ${it.from} ning ${fd(ds[0])} dan ${fd(ds[ds.length-1])} gacha yozgan ${fmtNum(sub.length)} ta zakazi (${fmtSum(sum)}) shu menejer hisobiga qo'shilgan.</div>`;
+  }).join('');
+}
 let CK_STATS = {};
 function isChakanaMijoz(o){
   const c = String(o.client||'').toUpperCase().split(/\s+/).filter(Boolean).join(' ');
@@ -1176,6 +1191,7 @@ function renderManagers(){
         <div><div class="mgr-stat-label">Jami bonus</div><div class="mgr-stat-value" style="color:var(--gold); font-size:17px;">${fmtSum(bonusTotal)}</div></div>
       </div>
       ${chakanaNote(m.manager)}
+      ${reassignNote(m.manager, kpiOrders.filter(o=>!isChakanaMijoz(o)))}
     </div>`;
   }).join('');
   document.getElementById('managerCards').innerHTML = html;
