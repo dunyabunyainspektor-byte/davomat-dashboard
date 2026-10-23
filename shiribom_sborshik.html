@@ -710,23 +710,26 @@ function renderOverview(){
       } }
   });
 
-  const byPicker = aggregateByPicker(docs).sort((a,b)=>b.positions-a.positions);
+  const byPicker = aggregateByPicker(docs).filter(m=>m.positions>0).sort((a,b)=>b.positions-a.positions);
+  // 2026-10-23: grafik balandligi yig'uvchilar soniga qarab (aks holda ba'zi ismlar tushib qolardi); bu oyda ishlamaganlar ko'rsatilmaydi
+  { const _h = Math.max(220, byPicker.length*30+60);
+    ['chartPickerPositions','chartPickerBonus'].forEach(id=>{ const el=document.getElementById(id); if(el && el.parentElement) el.parentElement.style.height=_h+'px'; }); }
     makeChart('picker-pos-ov', document.getElementById('chartPickerPositions'), {
     type:'bar',
-    data:{ labels: byPicker.map(m=>m.picker.split(' ').slice(0,2).join(' ')),
+    data:{ labels: byPicker.map(m=>m.picker.split(' ').slice(0,2)),   // 2 qatorli yorliq: familya / ism (uzun ismlar kesilmasin)
       datasets:[{ label:'Pozitsiya', data: byPicker.map(m=>m.positions), backgroundColor: GOLD, borderRadius:5, maxBarThickness:24 }]},
     options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>fmtNum(c.raw)+' ta' } } },
-      scales:{ x:{ ticks:{ precision:0 }, grid:{color:'rgba(255,255,255,0.05)'} }, y:{ grid:{display:false} } } }
+      scales:{ x:{ ticks:{ precision:0 }, grid:{color:'rgba(255,255,255,0.05)'} }, y:{ grid:{display:false}, ticks:{ autoSkip:false } } } }
   });
 
     makeChart('picker-bonus-ov', document.getElementById('chartPickerBonus'), {
     type:'bar',
-    data:{ labels: byPicker.map(m=>m.picker.split(' ').slice(0,2).join(' ')),
+    data:{ labels: byPicker.map(m=>m.picker.split(' ').slice(0,2)),   // 2 qatorli yorliq: familya / ism (uzun ismlar kesilmasin)
       datasets:[{ label:'Bonus', data: byPicker.map(m=>m.bonus), backgroundColor: GREEN, borderRadius:5, maxBarThickness:24 }]},
     options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>fmtSum(c.raw) } } },
-      scales:{ x:{ ticks:{ callback:v=>fmtSumShort(v) }, grid:{color:'rgba(255,255,255,0.05)'} }, y:{ grid:{display:false} } } }
+      scales:{ x:{ ticks:{ callback:v=>(v>=1e6? fmtNum(v/1e6,1)+' mln' : (v>=1000? fmtNum(v/1000,0)+' ming' : v)), maxTicksLimit:5, maxRotation:0 }, grid:{color:'rgba(255,255,255,0.05)'} }, y:{ grid:{display:false}, ticks:{ autoSkip:false } } } }
   });
 }
 
