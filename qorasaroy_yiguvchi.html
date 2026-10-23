@@ -347,9 +347,6 @@ const BRAND_NAME = "Qorasaroy yig'uvchi";
           Jami bonus = (Chiqim pozitsiyalari + Tovar o'tkazish pozitsiyalari) × 500 so'm. Ushbu blok butun davr ma'lumotlariga asoslanadi (filtrlardan mustaqil). Yig'uvchilar <b>Responsible Picker</b> ustuni bo'yicha aniqlanadi.
         </p>
         <p class="dim" style="line-height:1.7; font-size:13px; margin-top:10px;">
-          <b style="color:var(--gold)">TOP-3 mukofoti</b> — umumiy yig'ilgan pozitsiya bo'yicha eng yaxshi 3 ta yig'uvchiga qo'shimcha mukofot beriladi: 🥇 <b>1-o'rin — 1 000 000 so'm</b>, 🥈 <b>2-o'rin — 500 000 so'm</b>, 🥉 <b>3-o'rin — 200 000 so'm</b>.
-        </p>
-        <p class="dim" style="line-height:1.7; font-size:13px; margin-top:10px;">
           Har kuni ma'lumot yangilanganda, kechagi kunga nisbatan bugungi reytingdagi <b>o'rin o'zgarishi</b> (necha pog'ona ko'tarilgan yoki tushgan) har bir kartochkada ko'rsatiladi — bu yig'uvchilar orasida ichki raqobatni kuchaytirish uchun.
         </p>
       </div>
@@ -437,7 +434,7 @@ const BRAND_NAME = "Qorasaroy yig'uvchi";
 <script>
 
 const BONUS_RATE = 500;
-const TOP_BONUS = [1000000, 500000, 200000];
+const TOP_BONUS = [0, 0, 0];   // Qorasaroy yig'uvchida TOP-3 mukofoti YO'Q
 
 // Jarima kunlari: shu kunlarda yig'ilgan pozitsiyalar reytingga (o'rinni) ta'sir qiladi, lekin bonus hisoblanmaydi.
 const PENALTY_DAYS = {};
@@ -699,7 +696,7 @@ function aggregateByPicker(docs){
 
 // ---------- rank change (compared against last known snapshot) ----------
 // Snapshot = each picker's cumulative total pozitsiya as of the previous dashboard refresh.
-const PREV_SNAPSHOT = {};
+const PREV_SNAPSHOT = {"MANNOPOV BEKZOD RUSTAM O‘G‘LI": 251, "MUXAMEDOV LUTFULLA ABDUSAMATOVICH": 252, "YANIN FIRDAVS MAXAMADJONOVICH": 320};
 const ALL_DATES = [...new Set(RAW_DOCS.map(d=>d.dkey))].filter(k=>k!=='noma-lum').sort();
 const TODAY_KEY = ALL_DATES[ALL_DATES.length-1];
 const totalsAllTime = aggregateByPicker(RAW_DOCS).sort((a,b)=>b.positions-a.positions);
