@@ -716,7 +716,7 @@ function aggregateByPicker(docs){
 
 // ---------- rank change (compared against last known snapshot) ----------
 // Snapshot = each picker's cumulative total pozitsiya as of the previous dashboard refresh.
-const PREV_SNAPSHOT = {"SHOALIMOV SHOBILOL O‘KTAMJON O‘G‘LI": 9447, "MANNOPOV BEKZOD RUSTAM O‘G‘LI": 3262, "KARIMOV ABDURAHMON ODILJON O‘G‘LI": 1256, "OBIDOV MAHMUDJON MURODJON O‘G‘LI": 7078, "SULTANMAXMUDOV AXMADJON SOBIT O‘G‘LI": 3564, "MUSLIMOV OZODBEK SHUXRAT O‘G‘LI": 476, "BADALOV SARDOR SANJAR O‘G‘LI": 71, "YUNUSOV MUXAMMAD AKMAL O‘G‘LI": 67, "ZOKIROV ABRORJON ANVARJON O‘G‘LI": 48, "EGAMBERDIYEV ANVARBEK ULUG‘BEK O‘G‘LI": 138, "KOZIMBEKOV FOZILBEK FOTIKBEK O‘G‘LI": 158, "VAHOBJONOV BEKZOD BAXTIYORJON O‘G‘LI": 5};
+const PREV_SNAPSHOT = {"SHOALIMOV SHOBILOL O‘KTAMJON O‘G‘LI": 10129, "MANNOPOV BEKZOD RUSTAM O‘G‘LI": 3262, "KARIMOV ABDURAHMON ODILJON O‘G‘LI": 1256, "OBIDOV MAHMUDJON MURODJON O‘G‘LI": 8378, "SULTANMAXMUDOV AXMADJON SOBIT O‘G‘LI": 3873, "MUSLIMOV OZODBEK SHUXRAT O‘G‘LI": 476, "YUNUSOV MUXAMMAD AKMAL O‘G‘LI": 939, "BADALOV SARDOR SANJAR O‘G‘LI": 1144, "ZOKIROV ABRORJON ANVARJON O‘G‘LI": 448, "KOZIMBEKOV FOZILBEK FOTIKBEK O‘G‘LI": 1334, "EGAMBERDIYEV ANVARBEK ULUG‘BEK O‘G‘LI": 723, "VAHOBJONOV BEKZOD BAXTIYORJON O‘G‘LI": 696};
 const ALL_DATES = [...new Set(RAW_DOCS.map(d=>d.dkey))].filter(k=>k!=='noma-lum').sort();
 const TODAY_KEY = ALL_DATES[ALL_DATES.length-1];
 const totalsAllTime = aggregateByPicker(RAW_DOCS).sort((a,b)=>b.positions-a.positions);
@@ -778,23 +778,26 @@ function renderOverview(){
       } }
   });
 
-  const byPicker = aggregateByPicker(docs).sort((a,b)=>b.positions-a.positions);
+  const byPicker = aggregateByPicker(docs).filter(m=>m.positions>0).sort((a,b)=>b.positions-a.positions);
+  // 2026-10-23: grafik balandligi yig'uvchilar soniga qarab (aks holda ba'zi ismlar tushib qolardi); bu oyda ishlamaganlar ko'rsatilmaydi
+  { const _h = Math.max(220, byPicker.length*30+60);
+    ['chartPickerPositions','chartPickerBonus'].forEach(id=>{ const el=document.getElementById(id); if(el && el.parentElement) el.parentElement.style.height=_h+'px'; }); }
   safeChart('picker-pos-ov','chartPickerPositions',{
     type:'bar',
-    data:{ labels: byPicker.map(m=>m.picker.split(' ').slice(0,2).join(' ')),
+    data:{ labels: byPicker.map(m=>m.picker.split(' ').slice(0,2)),   // 2 qatorli yorliq: familya / ism (uzun ismlar kesilmasin)
       datasets:[{ label:'Pozitsiya', data: byPicker.map(m=>m.positions), backgroundColor: GOLD, borderRadius:5, maxBarThickness:24 }]},
     options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>fmtNum(c.raw)+' ta' } } },
-      scales:{ x:{ ticks:{ precision:0 }, grid:{color:'rgba(255,255,255,0.05)'} }, y:{ grid:{display:false} } } }
+      scales:{ x:{ ticks:{ precision:0 }, grid:{color:'rgba(255,255,255,0.05)'} }, y:{ grid:{display:false}, ticks:{ autoSkip:false } } } }
   });
 
   safeChart('picker-bonus-ov','chartPickerBonus',{
     type:'bar',
-    data:{ labels: byPicker.map(m=>m.picker.split(' ').slice(0,2).join(' ')),
+    data:{ labels: byPicker.map(m=>m.picker.split(' ').slice(0,2)),   // 2 qatorli yorliq: familya / ism (uzun ismlar kesilmasin)
       datasets:[{ label:'Bonus', data: byPicker.map(m=>m.bonus), backgroundColor: GREEN, borderRadius:5, maxBarThickness:24 }]},
     options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>fmtSum(c.raw) } } },
-      scales:{ x:{ ticks:{ callback:v=>fmtSumShort(v) }, grid:{color:'rgba(255,255,255,0.05)'} }, y:{ grid:{display:false} } } }
+      scales:{ x:{ ticks:{ callback:v=>(v>=1e6? fmtNum(v/1e6,1)+' mln' : (v>=1000? fmtNum(v/1000,0)+' ming' : v)), maxTicksLimit:5, maxRotation:0 }, grid:{color:'rgba(255,255,255,0.05)'} }, y:{ grid:{display:false}, ticks:{ autoSkip:false } } } }
   });
 }
 
