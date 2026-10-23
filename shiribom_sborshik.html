@@ -261,7 +261,7 @@
   <div class="sidebar-foot">
     Manba: <b>Stock Picking (chiqim, tovar o'tkazish)</b><br>
     Hisoblash birligi: <b>Операции/Товар (pozitsiya)</b><br>
-    Davr: <b>Avgust 2026</b><br>
+    Davr: <b id="sidebarDavr">Avgust 2026</b><br>
     Bonus: <b>500 so'm / pozitsiya</b>
   </div>
 </aside>
@@ -437,7 +437,7 @@ const PICKER_PHOTOS = {"MAMARAJABOV ELDOR PANJI O‘G‘LI": "/9j/4AAQSkZJRgABAQ
 
 RAW_DOCS.forEach(d=>{
   d.dt = d.date ? new Date(d.date) : null;
-  d.dkey = d.dt ? d.dt.toISOString().slice(0,10) : 'noma-lum';
+  d.dkey = d.dt ? (d.dt.getFullYear()+'-'+String(d.dt.getMonth()+1).padStart(2,'0')+'-'+String(d.dt.getDate()).padStart(2,'0')) : 'noma-lum';  // 2026-10-23: mahalliy sana (UTC emas)
   d.bonus = d.positions * BONUS_RATE;
 });
 
@@ -466,6 +466,11 @@ function fmtSumShort(n){
 function fmtDate(dt){
   if(!dt) return '\u2014';
   return String(dt.getDate()).padStart(2,'0')+' '+MONTHS_UZ[dt.getMonth()]+' '+dt.getFullYear();
+}
+function dayAxisLabels(byDay){
+  // 2026-10-21: grafik pastida sanalar oddiy kun raqami (1, 2, 3...) ko'rinadi; bir necha oy bo'lsa oy boshi "1 noy" kabi.
+  const multi = new Set(byDay.map(d=>d.date? d.date.getFullYear()*12+d.date.getMonth() : 0)).size > 1;
+  return byDay.map((d,i)=>{ if(!d.date) return ''; const n=d.date.getDate(); return (multi && (i===0||n===1)) ? n+' '+MONTHS_UZ[d.date.getMonth()] : String(n); });
 }
 function fmtDateTime(dt){
   if(!dt) return '\u2014';
@@ -575,6 +580,7 @@ function applyMonth(y,m){
   const { from, to } = monthBounds(y,m);
   filters.dateFrom = from; filters.dateTo = to;
   monthLabelEl.textContent = `${MONTHS_UZ_FULL[m]} ${y}`;
+  { const _sd = document.getElementById('sidebarDavr'); if(_sd) _sd.textContent = `${MONTHS_UZ_FULL[m]} ${y}`; }   // 2026-10-23: avval qotib qolgan 'Avgust 2026' edi
   monthNextBtn.disabled = (y===CURRENT_Y && m===CURRENT_M);
   renderAll();
 }
@@ -683,13 +689,13 @@ function renderOverview(){
   const byDay = aggregateByDay(docs);
     makeChart('daily-ov', document.getElementById('chartDailyOverview'), {
     type:'line',
-    data:{ labels: byDay.map(d=>fmtDate(d.date)),
+    data:{ labels: dayAxisLabels(byDay),
       datasets:[
         { label:'Chiqim pozitsiya', data: byDay.map(d=>d.chiqim_pos), borderColor: GOLD, backgroundColor:'rgba(212,175,55,0.12)', fill:true, tension:0.35, pointRadius:2, pointBackgroundColor:GOLD },
         { label:"Tovar o'tkazish pozitsiya", data: byDay.map(d=>d.otk_pos), borderColor: BLUE, backgroundColor:'rgba(111,168,220,0.10)', fill:true, tension:0.35, pointRadius:2, pointBackgroundColor:BLUE, borderWidth:2 }
       ]},
     options:{ responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{ position:'bottom', labels:{boxWidth:10,font:{size:11.5}} }, tooltip:{ mode:'index', intersect:false, callbacks:{ label:c=>c.dataset.label+': '+fmtNum(c.raw)+' ta' } } },
+      plugins:{ legend:{ position:'bottom', labels:{boxWidth:10,font:{size:11.5}} }, tooltip:{ mode:'index', intersect:false, callbacks:{ title:items=>fmtDate(byDay[items[0].dataIndex].date), label:c=>c.dataset.label+': '+fmtNum(c.raw)+' ta' } } },
       interaction:{ mode:'index', intersect:false },
       scales:{ y:{ ticks:{ precision:0 }, grid:{color:'rgba(255,255,255,0.05)'} }, x:{ grid:{display:false} } } }
   });
@@ -800,13 +806,13 @@ function renderDaily(){
 
     makeChart('daily-main', document.getElementById('chartDailyMain'), {
     type:'bar',
-    data:{ labels: byDay.map(d=>fmtDate(d.date)),
+    data:{ labels: dayAxisLabels(byDay),
       datasets:[
         { label:'Chiqim', data: byDay.map(d=>d.chiqim_pos), backgroundColor: GOLD, borderRadius:4, stack:'s' },
         { label:"Tovar o'tkazish", data: byDay.map(d=>d.otk_pos), backgroundColor: BLUE, borderRadius:4, stack:'s' }
       ]},
     options:{ responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{ position:'bottom', labels:{boxWidth:10,font:{size:11.5}} }, tooltip:{ callbacks:{ label:c=>c.dataset.label+': '+fmtNum(c.raw)+' ta' } } },
+      plugins:{ legend:{ position:'bottom', labels:{boxWidth:10,font:{size:11.5}} }, tooltip:{ callbacks:{ title:items=>fmtDate(byDay[items[0].dataIndex].date), label:c=>c.dataset.label+': '+fmtNum(c.raw)+' ta' } } },
       scales:{ y:{ stacked:true, ticks:{ precision:0 }, grid:{color:'rgba(255,255,255,0.05)'} }, x:{ stacked:true, grid:{display:false} } } }
   });
 
