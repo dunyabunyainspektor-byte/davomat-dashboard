@@ -782,20 +782,30 @@ function renderOverview(){
 }
 
 function renderPickers(){
-  const byPicker = [...totalsAllTime];
+  // 2026-10-23: TANLANGAN OY bo'yicha (avval hamma oylar birga hisoblanardi va oy tugmasi bu bo'limga ta'sir qilmasdi)
+  const _mp = `${monthCursor.y}-${pad2(monthCursor.m+1)}`;
+  const _pm = monthCursor.m===0 ? {y:monthCursor.y-1, m:11} : {y:monthCursor.y, m:monthCursor.m-1};
+  const _pp = `${_pm.y}-${pad2(_pm.m+1)}`;
+  const _byPos = docs => aggregateByPicker(docs).filter(x=>x.positions>0).sort((a,b)=>b.positions-a.positions);
+  const byPicker = _byPos(RAW_DOCS.filter(d=>d.dkey && d.dkey.startsWith(_mp)));
+  const prevOrder = _byPos(RAW_DOCS.filter(d=>d.dkey && d.dkey.startsWith(_pp))).map(x=>x.picker);
+  if(!byPicker.length){ document.getElementById('pickerCards').innerHTML = '<div class="panel" style="padding:24px;text-align:center;color:var(--text-dim);">Bu oyda ma\'lumot yo\'q</div>'; return; }
   const html = byPicker.map((m,i)=>{
     const rankClass = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-n';
     const cardClass = i===0?'top1':i===1?'top2':i===2?'top3':'';
     const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
-    const rc = getRankChange(m.picker);
-    let rcHtml;
-    if(rc.isNew){ rcHtml = `<span class="rank-change new">YANGI</span>`; }
-    else if(rc.delta>0){ rcHtml = `<span class="rank-change up">▲ ${rc.delta}</span>`; }
-    else if(rc.delta<0){ rcHtml = `<span class="rank-change down">▼ ${Math.abs(rc.delta)}</span>`; }
-    else{ rcHtml = `<span class="rank-change same">= 0</span>`; }
-    const topB = topBonusFor(m.picker);
+    let rcHtml = '';
+    if(prevOrder.length){
+      const pi = prevOrder.indexOf(m.picker);
+      if(pi<0) rcHtml = `<span class="rank-change new">YANGI</span>`;
+      else { const delta = pi - i;
+        if(delta>0) rcHtml = `<span class="rank-change up">\u25b2 ${delta}</span>`;
+        else if(delta<0) rcHtml = `<span class="rank-change down">\u25bc ${Math.abs(delta)}</span>`;
+        else rcHtml = `<span class="rank-change same">= 0</span>`; }
+    }
+    const topB = i<3 ? TOP_BONUS[i] : 0;
     const totalBonus = m.bonus + topB;
-    const penaltyDates = PENALTY_DAYS[m.picker] || [];
+    const penaltyDates = (PENALTY_DAYS[m.picker] || []).filter(ds=>ds.startsWith(_mp));
     return `
     <div class="mgr-card ${cardClass}">
       <div class="mgr-head">
