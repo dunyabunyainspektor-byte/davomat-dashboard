@@ -731,19 +731,22 @@ function renderOverview(){
 }
 
 function computeRankMap(docsSubset){
-  const agg = aggregateByPicker(docsSubset).sort((a,b)=>b.positions-a.positions);
+  const agg = aggregateByPicker(docsSubset).filter(x=>x.positions>0).sort((a,b)=>b.positions-a.positions);
   const map = {};
   agg.forEach((m,i)=>{ map[m.picker] = i+1; });
   return map;
 }
 
 function renderPickers(){
-  const byPicker = aggregateByPicker(RAW_DOCS).sort((a,b)=>b.positions-a.positions);
-
-  const allDates = RAW_DOCS.map(d=>d.dkey).filter(k=>k && k!=='noma-lum');
-  const latestDate = allDates.length ? allDates.reduce((a,b)=> a>b?a:b) : null;
-  const priorDocs = latestDate ? RAW_DOCS.filter(d=>d.dkey && d.dkey < latestDate) : [];
-  const todayRank = computeRankMap(RAW_DOCS);
+  // 2026-10-23: TANLANGAN OY bo'yicha (avval hamma oylar birga hisoblanardi va oy tugmasi bu bo'limga ta'sir qilmasdi)
+  const _mp = `${monthCursor.y}-${pad2(monthCursor.m+1)}`;
+  const _pm = monthCursor.m===0 ? {y:monthCursor.y-1, m:11} : {y:monthCursor.y, m:monthCursor.m-1};
+  const _pp = `${_pm.y}-${pad2(_pm.m+1)}`;
+  const monthDocs = RAW_DOCS.filter(d=>d.dkey && d.dkey.startsWith(_mp));
+  const priorDocs = RAW_DOCS.filter(d=>d.dkey && d.dkey.startsWith(_pp));
+  const byPicker = aggregateByPicker(monthDocs).filter(x=>x.positions>0).sort((a,b)=>b.positions-a.positions);
+  if(!byPicker.length){ document.getElementById('pickerCards').innerHTML = '<div class="panel" style="padding:24px;text-align:center;color:var(--text-dim);">Bu oyda ma\'lumot yo\'q</div>'; return; }
+  const todayRank = computeRankMap(monthDocs);
   const yesterdayRank = computeRankMap(priorDocs);
   const hasPriorData = priorDocs.length > 0;
 
