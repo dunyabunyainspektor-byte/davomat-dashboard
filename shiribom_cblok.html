@@ -464,15 +464,16 @@ const RAW_DOCS = RAW_DOCS_C.map(c=>{
   };
 });
 
+function localKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 RAW_DOCS.forEach(d=>{
   d.dt = d.dt0;
   // 30/31-iyul sanasidagi hujjatlar 1-avgust sanasi deb hisoblanadi (soat/daqiqa saqlanadi, faqat sana suriladi)
   if(d.dt){
-    const origKey = d.dt.toISOString().slice(0,10);
+    const origKey = localKey(d.dt);
     if(origKey === '2026-07-30') d.dt = new Date(d.dt.getTime() + 2*24*60*60*1000);
     else if(origKey === '2026-07-31') d.dt = new Date(d.dt.getTime() + 1*24*60*60*1000);
   }
-  d.dkey = d.dt ? d.dt.toISOString().slice(0,10) : 'noma-lum';
+  d.dkey = d.dt ? localKey(d.dt) : 'noma-lum';   // 2026-10-23: mahalliy sana (UTC emas) - tungi 00:00-05:00 hujjatlar oldingi kunga/oyga tushmasin
   d.penalized = !!(PENALTY_DAYS[d.picker] && PENALTY_DAYS[d.picker].includes(d.dkey));
   d.bonus = d.penalized ? 0 : d.positions * BONUS_RATE;
 });
@@ -715,7 +716,7 @@ function aggregateByPicker(docs){
 
 // ---------- rank change (compared against last known snapshot) ----------
 // Snapshot = each picker's cumulative total pozitsiya as of the previous dashboard refresh.
-const PREV_SNAPSHOT = {"SHOALIMOV SHOBILOL O‘KTAMJON O‘G‘LI": 9310, "MANNOPOV BEKZOD RUSTAM O‘G‘LI": 3262, "KARIMOV ABDURAHMON ODILJON O‘G‘LI": 1256, "OBIDOV MAHMUDJON MURODJON O‘G‘LI": 6853, "SULTANMAXMUDOV AXMADJON SOBIT O‘G‘LI": 3291, "MUSLIMOV OZODBEK SHUXRAT O‘G‘LI": 476};
+const PREV_SNAPSHOT = {"SHOALIMOV SHOBILOL O‘KTAMJON O‘G‘LI": 10008, "MANNOPOV BEKZOD RUSTAM O‘G‘LI": 3262, "KARIMOV ABDURAHMON ODILJON O‘G‘LI": 1256, "OBIDOV MAHMUDJON MURODJON O‘G‘LI": 8134, "SULTANMAXMUDOV AXMADJON SOBIT O‘G‘LI": 3657, "MUSLIMOV OZODBEK SHUXRAT O‘G‘LI": 476, "BADALOV SARDOR SANJAR O‘G‘LI": 1027, "YUNUSOV MUXAMMAD AKMAL O‘G‘LI": 886, "ZOKIROV ABRORJON ANVARJON O‘G‘LI": 404, "EGAMBERDIYEV ANVARBEK ULUG‘BEK O‘G‘LI": 579, "VAHOBJONOV BEKZOD BAXTIYORJON O‘G‘LI": 675, "KOZIMBEKOV FOZILBEK FOTIKBEK O‘G‘LI": 1123};
 const ALL_DATES = [...new Set(RAW_DOCS.map(d=>d.dkey))].filter(k=>k!=='noma-lum').sort();
 const TODAY_KEY = ALL_DATES[ALL_DATES.length-1];
 const totalsAllTime = aggregateByPicker(RAW_DOCS).sort((a,b)=>b.positions-a.positions);
@@ -798,20 +799,30 @@ function renderOverview(){
 }
 
 function renderPickers(){
-  const byPicker = [...totalsAllTime];
+  // 2026-10-23: TANLANGAN OY bo'yicha (avval hamma oylar birga hisoblanardi va oy tugmasi bu bo'limga ta'sir qilmasdi)
+  const _mp = `${monthCursor.y}-${pad2(monthCursor.m+1)}`;
+  const _pm = monthCursor.m===0 ? {y:monthCursor.y-1, m:11} : {y:monthCursor.y, m:monthCursor.m-1};
+  const _pp = `${_pm.y}-${pad2(_pm.m+1)}`;
+  const _byPos = docs => aggregateByPicker(docs).filter(x=>x.positions>0).sort((a,b)=>b.positions-a.positions);
+  const byPicker = _byPos(RAW_DOCS.filter(d=>d.dkey && d.dkey.startsWith(_mp)));
+  const prevOrder = _byPos(RAW_DOCS.filter(d=>d.dkey && d.dkey.startsWith(_pp))).map(x=>x.picker);
+  if(!byPicker.length){ document.getElementById('pickerCards').innerHTML = '<div class="panel" style="padding:24px;text-align:center;color:var(--text-dim);">Bu oyda ma\'lumot yo\'q</div>'; return; }
   const html = byPicker.map((m,i)=>{
     const rankClass = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-n';
     const cardClass = i===0?'top1':i===1?'top2':i===2?'top3':'';
     const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
-    const rc = getRankChange(m.picker);
-    let rcHtml;
-    if(rc.isNew){ rcHtml = `<span class="rank-change new">YANGI</span>`; }
-    else if(rc.delta>0){ rcHtml = `<span class="rank-change up">▲ ${rc.delta}</span>`; }
-    else if(rc.delta<0){ rcHtml = `<span class="rank-change down">▼ ${Math.abs(rc.delta)}</span>`; }
-    else{ rcHtml = `<span class="rank-change same">= 0</span>`; }
-    const topB = topBonusFor(m.picker);
+    let rcHtml = '';
+    if(prevOrder.length){
+      const pi = prevOrder.indexOf(m.picker);
+      if(pi<0) rcHtml = `<span class="rank-change new">YANGI</span>`;
+      else { const delta = pi - i;
+        if(delta>0) rcHtml = `<span class="rank-change up">\u25b2 ${delta}</span>`;
+        else if(delta<0) rcHtml = `<span class="rank-change down">\u25bc ${Math.abs(delta)}</span>`;
+        else rcHtml = `<span class="rank-change same">= 0</span>`; }
+    }
+    const topB = i<3 ? TOP_BONUS[i] : 0;
     const totalBonus = m.bonus + topB;
-    const penaltyDates = PENALTY_DAYS[m.picker] || [];
+    const penaltyDates = (PENALTY_DAYS[m.picker] || []).filter(ds=>ds.startsWith(_mp));
     return `
     <div class="mgr-card ${cardClass}">
       <div class="mgr-head">
@@ -870,7 +881,7 @@ function renderDaily(){
   document.getElementById('dailyTableHint').textContent = `${byDay.length} kun`;
   const rowFn = d=>`
     <tr>
-      <td>${fmtDate(d.date)}${d.date && d.date.toISOString().slice(0,10)===TODAY_KEY ? ' <span style="color:var(--gold);font-size:10px;">(bugun)</span>':''}</td>
+      <td>${fmtDate(d.date)}${d.date && localKey(d.date)===TODAY_KEY ? ' <span style="color:var(--gold);font-size:10px;">(bugun)</span>':''}</td>
       <td class="num mono">${fmtNum(d.docs)}</td>
       <td class="num mono">${fmtNum(d.chiqim_pos)}</td>
       <td class="num mono">${fmtNum(d.otk_pos)}</td>
