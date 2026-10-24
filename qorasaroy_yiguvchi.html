@@ -280,7 +280,7 @@ const BRAND_NAME = "Qorasaroy yig'uvchi";
     Manba: <b>Odoo API — stock.picking (chiqim, tovar o'tkazish)</b><br>
     Hisoblash birligi: <b>Операции/Товар (pozitsiya)</b><br>
     Davr: <b id="footDateRange">—</b><br>
-    Oxirgi yangilanish: <b>24.10.2026 19:00</b><br>
+    Oxirgi yangilanish: <b>24.10.2026 19:15</b><br>
     Bonus: <b>500 so'm / pozitsiya</b>
   </div>
 </aside>
@@ -697,7 +697,7 @@ function aggregateByPicker(docs){
 
 // ---------- rank change (compared against last known snapshot) ----------
 // Snapshot = each picker's cumulative total pozitsiya as of the previous dashboard refresh.
-const PREV_SNAPSHOT = {"MANNOPOV BEKZOD RUSTAM O‘G‘LI": 260, "MUXAMEDOV LUTFULLA ABDUSAMATOVICH": 291, "YANIN FIRDAVS MAXAMADJONOVICH": 391};
+const PREV_SNAPSHOT = {"MANNOPOV BEKZOD RUSTAM O‘G‘LI": 260, "MUXAMEDOV LUTFULLA ABDUSAMATOVICH": 299, "YANIN FIRDAVS MAXAMADJONOVICH": 399};
 const ALL_DATES = [...new Set(RAW_DOCS.map(d=>d.dkey))].filter(k=>k!=='noma-lum').sort();
 const TODAY_KEY = ALL_DATES[ALL_DATES.length-1];
 const totalsAllTime = aggregateByPicker(RAW_DOCS).sort((a,b)=>b.positions-a.positions);
