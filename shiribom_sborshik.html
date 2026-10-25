@@ -262,7 +262,7 @@
     Manba: <b>Odoo API — stock.picking (chiqim, tovar o'tkazish)</b><br>
     Hisoblash birligi: <b>Операции/Товар (pozitsiya)</b><br>
     Davr: <b id="sidebarDavr">Avgust 2026</b><br>
-    Oxirgi yangilanish: <b>25.10.2026 16:45</b><br>
+    Oxirgi yangilanish: <b>25.10.2026 16:52</b><br>
     Bonus: <b>500 so'm / pozitsiya</b>
   </div>
 </aside>
@@ -925,5 +925,167 @@ attachSort('tblOtkazish','date','desc');
 applyMonth(CURRENT_Y, CURRENT_M);
 
 </script>
+<!-- DRP:START — davr (sana oralig'i) kalendari: oy nomi bosilganda ochiladi -->
+<style>
+  .month-label{ cursor:pointer; user-select:none; border-radius:7px; transition:color .15s, background .15s; }
+  .month-label::after{ content:'▾'; margin-left:6px; font-size:10px; color:var(--gold-dim); }
+  .month-label:hover{ color:var(--gold); background:var(--gold-soft); }
+  .month-label.drp-open{ color:var(--gold); background:var(--gold-soft); }
+  .drp{ position:fixed; z-index:9999; width:318px; max-width:calc(100vw - 20px); background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:14px; box-shadow:0 18px 50px rgba(0,0,0,.55); font-family:var(--font-body); color:var(--text); display:none; }
+  .drp.show{ display:block; animation:drpIn .14s ease-out; }
+  @keyframes drpIn{ from{ opacity:0; transform:translateY(-4px); } to{ opacity:1; transform:none; } }
+  .drp-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px; }
+  .drp-nav{ width:30px; height:30px; border-radius:8px; border:1px solid var(--border-soft); background:none; color:var(--text-dim); font-size:16px; line-height:1; cursor:pointer; transition:all .15s; }
+  .drp-nav:hover:not(:disabled){ background:var(--gold-soft); color:var(--gold); border-color:var(--border); }
+  .drp-nav:disabled{ opacity:.3; cursor:not-allowed; }
+  .drp-title{ font-family:var(--font-display); font-weight:700; font-size:15px; color:var(--text); }
+  .drp-presets{ display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-bottom:12px; }
+  .drp-chip{ padding:7px 4px; border-radius:8px; border:1px solid var(--border-soft); background:none; color:var(--text-dim); font-size:12.5px; font-weight:600; cursor:pointer; font-family:var(--font-body); transition:all .15s; }
+  .drp-chip:hover{ background:var(--gold-soft); color:var(--gold); border-color:var(--border); }
+  .drp-chip.on{ background:var(--gold); color:#14110a; border-color:var(--gold); }
+  .drp-grid{ display:grid; grid-template-columns:repeat(7,1fr); row-gap:3px; }
+  .drp-dow{ text-align:center; font-size:11px; font-weight:700; color:var(--text-faint); padding:4px 0 6px; }
+  .drp-day{ height:34px; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; color:var(--text); cursor:pointer; position:relative; border:none; background:none; font-family:var(--font-mono); }
+  .drp-day:hover:not(.dis):not(.sel){ background:var(--gold-soft); border-radius:8px; }
+  .drp-day.dis{ color:var(--text-faint); opacity:.45; cursor:not-allowed; }
+  .drp-day.today::before{ content:''; position:absolute; inset:3px; border:1px solid var(--gold-dim); border-radius:8px; pointer-events:none; }
+  .drp-day.inr{ background:var(--gold-soft); }
+  .drp-day.inr.c-s{ border-top-left-radius:8px; border-bottom-left-radius:8px; }
+  .drp-day.inr.c-e{ border-top-right-radius:8px; border-bottom-right-radius:8px; }
+  .drp-day.inr.dow0{ border-top-left-radius:8px; border-bottom-left-radius:8px; }
+  .drp-day.inr.dow6{ border-top-right-radius:8px; border-bottom-right-radius:8px; }
+  .drp-day.sel{ background:var(--gold); color:#14110a; font-weight:800; border-radius:8px; }
+  .drp-hint{ text-align:center; font-size:12px; color:var(--text-dim); margin-top:12px; }
+</style>
+<script>
+(function(){
+  try{
+    var sw=document.getElementById('monthSwitch'), lab=document.getElementById('monthLabel');
+    if(!sw || !lab || typeof filters==='undefined' || typeof applyMonth!=='function') return;
+    var MS=['Yan','Fev','Mar','Apr','May','Iyn','Iyl','Avg','Sen','Okt','Noy','Dek'];
+    var DOW=['Du','Se','Ch','Pa','Ju','Sh','Ya'];
+    var p2=function(n){ return String(n).padStart(2,'0'); };
+    var key=function(y,m,d){ return y+'-'+p2(m+1)+'-'+p2(d); };
+    var todayKey=function(){ var t=new Date(); return key(t.getFullYear(),t.getMonth(),t.getDate()); };
+    var shift=function(k,n){ var d=new Date(+k.slice(0,4),+k.slice(5,7)-1,+k.slice(8,10)); d.setDate(d.getDate()+n); return key(d.getFullYear(),d.getMonth(),d.getDate()); };
+    var dayN=function(k){ return +k.slice(8,10); };
+    var monM=function(k){ return +k.slice(5,7)-1; };
+    var yearOf=function(k){ return +k.slice(0,4); };
+    var pop=document.createElement('div'); pop.className='drp'; pop.id='drpPop'; document.body.appendChild(pop);
+    var st={ vy:0, vm:0, pend:null, hover:null };
+
+    function rangeLabel(a,b){
+      if(a===b) return dayN(a)+' '+MS[monM(a)]+' '+yearOf(a);
+      if(monM(a)===monM(b) && yearOf(a)===yearOf(b)) return dayN(a)+'–'+dayN(b)+' '+MS[monM(b)]+' '+yearOf(b);
+      if(yearOf(a)===yearOf(b)) return dayN(a)+' '+MS[monM(a)]+' – '+dayN(b)+' '+MS[monM(b)]+' '+yearOf(b);
+      return dayN(a)+' '+MS[monM(a)]+' '+yearOf(a)+' – '+dayN(b)+' '+MS[monM(b)]+' '+yearOf(b);
+    }
+    function setExtraLabels(txt){
+      ['davrLabel','sidebarDavr'].forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent=txt; });
+    }
+    function applyRange(a,b){
+      if(a>b){ var t=a; a=b; b=t; }
+      var T=todayKey(); if(b>T) b=T; if(a>b) a=b;
+      var y=yearOf(b), m=monM(b);
+      var mb=monthBounds(y,m);
+      applyMonth(y,m);                       // oy bilan bog'liq hamma narsa (nav, snapshot, ...) to'g'rilanadi
+      if(a===mb.from && b===mb.to) return;   // butun oy
+      filters.dateFrom=a; filters.dateTo=b;
+      lab.textContent=rangeLabel(a,b);
+      setExtraLabels(rangeLabel(a,b));
+      renderAll();
+    }
+    function curRange(){
+      var a=filters.dateFrom, b=filters.dateTo;
+      return (a && b) ? [a,b] : null;
+    }
+    function isWholeMonth(y,m,r){ var mb=monthBounds(y,m); return r && r[0]===mb.from && r[1]===mb.to; }
+
+    function render(){
+      var T=todayKey(), r=curRange();
+      var vy=st.vy, vm=st.vm;
+      var a=null,b=null;
+      if(st.pend){ a=st.pend; b=st.hover||st.pend; if(a>b){ var x=a; a=b; b=x; } }
+      else if(r){ a=r[0]; b=r[1]; }
+      var first=new Date(vy,vm,1), off=(first.getDay()+6)%7, dim=new Date(vy,vm+1,0).getDate();
+      var isCur=(vy===CURRENT_Y && vm===CURRENT_M);
+      // preset belgilash
+      var on='';
+      if(!st.pend && r){
+        if(isWholeMonth(vy,vm,r)) on='m';
+        else if(r[1]===T){ [1,3,5,7,10].forEach(function(n){ if(r[0]===shift(T,-(n-1))) on=String(n); }); }
+      }
+      var h='<div class="drp-head"><button class="drp-nav" data-a="prev" title="Oldingi oy">‹</button><div class="drp-title">'+MONTHS_UZ_FULL[vm]+' '+vy+'</div><button class="drp-nav" data-a="next" '+(isCur?'disabled':'')+' title="Keyingi oy">›</button></div>';
+      h+='<div class="drp-presets">';
+      [['1','Bugun'],['3','3 kun'],['5','5 kun'],['7','7 kun'],['10','10 kun'],['m','Butun oy']].forEach(function(p){
+        h+='<button class="drp-chip'+(on===p[0]?' on':'')+'" data-p="'+p[0]+'">'+p[1]+'</button>';
+      });
+      h+='</div><div class="drp-grid">';
+      DOW.forEach(function(d){ h+='<div class="drp-dow">'+d+'</div>'; });
+      for(var i=0;i<off;i++) h+='<div></div>';
+      for(var d=1; d<=dim; d++){
+        var k=key(vy,vm,d), dw=(off+d-1)%7, cls='drp-day dow'+dw;
+        if(k>T) cls+=' dis';
+        if(k===T) cls+=' today';
+        if(a && b && k>=a && k<=b){ cls+=' inr'; if(k===a) cls+=' c-s'; if(k===b) cls+=' c-e'; }
+        if(a && (k===a || k===b)) cls+=' sel';
+        h+='<button class="'+cls+'" data-d="'+k+'"'+(k>T?' disabled':'')+'>'+d+'</button>';
+      }
+      h+='</div><div class="drp-hint">'+(st.pend?'Tugash sanasini tanlang':'Boshlanish, so‘ng tugash sanasini bosing')+'</div>';
+      pop.innerHTML=h;
+    }
+    function place(){
+      var r=sw.getBoundingClientRect(), w=pop.offsetWidth||318, left=r.left;
+      if(left+w>window.innerWidth-10) left=window.innerWidth-w-10;
+      if(left<10) left=10;
+      pop.style.left=left+'px'; pop.style.top=(r.bottom+8)+'px';
+    }
+    function open(){
+      var r=curRange();
+      st.vy=r?yearOf(r[1]):monthCursor.y; st.vm=r?monM(r[1]):monthCursor.m; st.pend=null; st.hover=null;
+      render(); pop.classList.add('show'); lab.classList.add('drp-open'); place();
+    }
+    function close(){ pop.classList.remove('show'); lab.classList.remove('drp-open'); st.pend=null; st.hover=null; }
+    lab.addEventListener('click', function(e){ e.stopPropagation(); pop.classList.contains('show') ? close() : open(); });
+    pop.addEventListener('click', function(e){
+      e.stopPropagation();
+      var n=e.target.closest('[data-a]'), c=e.target.closest('[data-p]'), d=e.target.closest('[data-d]');
+      if(n){
+        if(n.disabled) return;
+        if(n.dataset.a==='prev'){ st.vm--; if(st.vm<0){ st.vm=11; st.vy--; } }
+        else { st.vm++; if(st.vm>11){ st.vm=0; st.vy++; } }
+        render(); return;
+      }
+      if(c){
+        var T=todayKey(), p=c.dataset.p;
+        if(p==='m'){ applyMonth(st.vy,st.vm); close(); return; }
+        var N=+p; applyRange(shift(T,-(N-1)),T); close(); return;
+      }
+      if(d && !d.disabled){
+        var k=d.dataset.d;
+        if(!st.pend){ st.pend=k; st.hover=null; render(); }
+        else { var a=st.pend; st.pend=null; applyRange(a,k); close(); }
+      }
+    });
+    pop.addEventListener('mouseover', function(e){
+      if(!st.pend) return;
+      var d=e.target.closest('[data-d]'); if(!d || d.disabled) return;
+      if(st.hover===d.dataset.d) return;
+      st.hover=d.dataset.d;
+      var a=st.pend, b=st.hover; if(a>b){ var t=a; a=b; b=t; }
+      pop.querySelectorAll('.drp-day').forEach(function(el){
+        var k=el.dataset.d, inr=(k>=a && k<=b);
+        el.classList.toggle('inr',inr); el.classList.toggle('c-s',inr&&k===a); el.classList.toggle('c-e',inr&&k===b); el.classList.toggle('sel',k===a||k===b);
+      });
+    });
+    document.addEventListener('click', function(e){ if(pop.classList.contains('show') && !pop.contains(e.target)) close(); });
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape') close(); });
+    window.addEventListener('resize', function(){ if(pop.classList.contains('show')) place(); });
+    lab.setAttribute('title','Davrni tanlash');
+  }catch(err){ console.warn('DRP:', err); }
+})();
+</script>
+<!-- DRP:END -->
+
 </body>
 </html>
