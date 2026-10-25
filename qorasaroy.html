@@ -253,13 +253,17 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5M9 12h7M9 16h7M9 8h2"/></svg>
       Buyurtmalar
     </button>
+    <button class="tab-btn" data-tab="tb">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.6 13.4 11 3.8A2 2 0 0 0 9.6 3.2H4a1 1 0 0 0-1 1v5.6a2 2 0 0 0 .6 1.4l9.6 9.6a2 2 0 0 0 2.8 0l4.6-4.6a2 2 0 0 0 0-2.8Z"/><circle cx="7.5" cy="7.7" r="1.2"/></svg>
+      Tovar bonus
+    </button>
   </nav>
   <div class="sidebar-foot">
     Manba: <b>Odoo API — sale.order + pos.order</b><br>
     Menejer ustuni: <b>Sotuvchi</b><br>
     Savdo nuqtasi: <b>Qorasaroy filiali POS_1</b><br>
     Davr: <b>Oktabr 2026</b><br>
-    Oxirgi yangilanish: <b>25.10.2026 15:45</b><br>
+    Oxirgi yangilanish: <b>25.10.2026 16:00</b><br>
     Odoo'dan har 15 daqiqada avtomatik yangilanadi.</div>
 </aside>
 
@@ -446,6 +450,15 @@
       </div>
     </div>
 
+    <!-- TOVAR BONUS (tovar_bonus dashboardining shu filial xodimlari uchun rejimi) -->
+    <div class="view" id="view-tb">
+      <div class="panel" style="padding:0; overflow:hidden;">
+        <div id="tbLoading" style="padding:40px 20px; text-align:center; font-size:13px; color:var(--text-faint);">Tovar bonus ma'lumotlari yuklanmoqda…</div>
+        <iframe id="tbFrame" title="Tovar bonus" style="width:100%; height:720px; border:0; display:block; background:transparent;"></iframe>
+      </div>
+      <div style="font-size:11.5px; margin-top:10px; color:var(--text-faint); line-height:1.6;">Bu bo'lim <a href="https://dunyabunyainspektor-byte.github.io/davomat-dashboard/tovar_bonus.html" target="_blank" rel="noopener" style="color:var(--gold);">Tovar Bonus dashboardi</a> bilan bir xil hisob-kitobdan olinadi, faqat shu filial xodimlari ko'rsatiladi. Bonus bosqichlari butun kompaniya savdosiga qarab belgilanadi.</div>
+    </div>
+
     <footer class="sig">
       <div class="divider"></div>
       Qorasaroy Chakana filiali · Savdo Boshqaruv Paneli — har kuni yangilanadigan hisobot uchun tayyorlangan
@@ -582,6 +595,7 @@ const charts = {};
 function destroyChart(id){ if(charts[id]){ charts[id].destroy(); delete charts[id]; } }
 
 const TAB_TITLES = {
+  tb:'Tovar bonus (brendlar)',
   overview:'Umumiy holat', managers:"Sotuvchilar & KPI", daily:'Kunlik savdo',
   customers:'Mijozlar', debts:'Qarzdorlik', orders:'Barcha buyurtmalar'
 };
@@ -593,6 +607,9 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
     document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
     document.getElementById('view-'+tab).classList.add('active');
     document.getElementById('pageTitle').textContent = TAB_TITLES[tab];
+    const _kvTab = (tab==='tb');
+    document.querySelector('.filters').style.display = _kvTab ? 'none' : '';
+    document.getElementById('filterCount').style.display = _kvTab ? 'none' : '';
     renderAll();
   });
 });
@@ -1053,6 +1070,25 @@ function updateFilterCount(){
   document.getElementById('filterCount').textContent = `${n} / ${RAW_ORDERS.length} buyurtma`;
 }
 
+/* ---------------- Tovar bonus (2026-10-25): tovar_bonus dashboardi shu filial xodimlari uchun ---------------- */
+const TB_DEPT = "QORASAROY CHAKANA";
+const TB_BASE = "https://dunyabunyainspektor-byte.github.io/davomat-dashboard/tovar_bonus.html";
+const TB_ORIGIN = 'https://dunyabunyainspektor-byte.github.io';
+function renderTB(){
+  const f = document.getElementById('tbFrame');
+  if(!f || f.dataset.loaded) return;
+  f.dataset.loaded = '1';
+  f.src = TB_BASE + '?embed=1&dept=' + encodeURIComponent(TB_DEPT) + '&t=' + Date.now();
+}
+window.addEventListener('message', function(e){
+  const d = e.data;
+  if(!d || d.type !== 'tb-height' || d.dept !== TB_DEPT) return;
+  if(e.origin !== TB_ORIGIN && e.origin !== 'null' && e.origin !== location.origin) return;
+  const f = document.getElementById('tbFrame'); if(!f) return;
+  f.style.height = Math.max(420, d.h + 4) + 'px';
+  const l = document.getElementById('tbLoading'); if(l) l.style.display = 'none';
+});
+
 function renderAll(){
   updateFilterCount();
   const activeTab = document.querySelector('.tab-btn.active').dataset.tab;
@@ -1062,6 +1098,7 @@ function renderAll(){
   else if(activeTab==='customers') renderCustomers();
   else if(activeTab==='debts') renderDebts();
   else if(activeTab==='orders') renderOrders();
+  else if(activeTab==='tb') renderTB();
 }
 
 populateFilterOptions();
