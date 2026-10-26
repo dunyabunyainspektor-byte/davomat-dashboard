@@ -156,11 +156,12 @@
   .filters select:hover, .filters input[type=text]:hover{ border-color:var(--border); }
   .filters select:focus, .filters input[type=text]:focus{ border-color:var(--gold-dim); }
   .filters .reset-btn{
-    background:none; border:1px solid var(--border); color:var(--gold-dim);
-    padding:8px 14px; border-radius:9px; font-size:12.5px; cursor:pointer; font-weight:600;
-    transition:all .15s;
+    background:var(--panel); border:1px solid var(--border-soft); color:var(--text-dim);
+    padding:9px 12px; border-radius:9px; cursor:pointer; flex:none;
+    display:inline-flex; align-items:center; justify-content:center; transition:all .15s;
   }
-  .filters .reset-btn:hover{ background:var(--gold-soft); color:var(--gold); }
+  .filters .reset-btn svg{ width:16px; height:16px; display:block; }
+  .filters .reset-btn:hover{ background:var(--panel-hover); border-color:var(--border); color:var(--gold); }
   .month-switch{ display:flex; align-items:center; gap:2px; background:var(--panel); border:1px solid var(--border-soft); border-radius:9px; padding:0 2px; }
   .month-nav-btn{ background:none; border:none; color:var(--text-dim); cursor:pointer; padding:7px 10px; font-size:15px; line-height:1; border-radius:7px; transition:color .15s, background .15s; }
   .month-nav-btn:hover{ background:var(--gold-soft); color:var(--gold); }
@@ -548,7 +549,7 @@
   <div class="sidebar-foot">
     Manba: <b>Odoo API — sale.order (1149 ta buyurtma)</b><br>
     Davr: <b>Oktabr 2026</b><br>
-    Oxirgi yangilanish: <b>26.10.2026 10:16</b><br>
+    Oxirgi yangilanish: <b>26.10.2026 10:30</b><br>
     Odoo'dan har 15 daqiqada avtomatik yangilanadi.</div>
 </aside>
 
@@ -597,7 +598,7 @@
         <span class="month-label" id="monthLabel">—</span>
         <button type="button" class="month-nav-btn" id="monthNext" title="Keyingi oy">›</button>
       </div>
-      <button class="reset-btn" id="resetFilters">Tozalash</button>
+      <button class="reset-btn" id="resetFilters" type="button" title="Filtrlarni tozalash" aria-label="Filtrlarni tozalash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></button>
     </div>
   </div>
 
