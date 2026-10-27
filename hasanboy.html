@@ -591,6 +591,23 @@
   .ov-cmpace{ margin-top:var(--sp-3); }
   .ov-cmpace-l{ display:flex; justify-content:space-between; gap:var(--sp-2); font-size:var(--fs-xs); color:var(--text-faint); margin-top:6px; }
 </style>
+<style id="ov-vs-css">
+  #ovCmp:empty{ display:none; }
+  #ovCmp{ padding:var(--sp-4) var(--sp-5); }
+  .ov-cmp-strip{ display:flex; flex-wrap:wrap; gap:var(--sp-3) var(--sp-7,32px); align-items:center; }
+  .ov-cmp-i{ display:flex; align-items:center; flex-wrap:wrap; gap:var(--sp-2) var(--sp-3); font-size:var(--fs-sm); }
+  .ov-cmp-i .l{ color:var(--text-faint); text-transform:uppercase; letter-spacing:.06em; font-size:var(--fs-2xs); font-weight:600; }
+  .ov-cmp-i b{ font-size:var(--fs-md,15px); }
+  .ov-cmp-i .p{ color:var(--text-dim); }
+  .ov-cmp-i .chip{ height:22px; font-size:var(--fs-2xs); }
+  .ov-vs{ margin-top:var(--sp-4); padding-top:var(--sp-3); border-top:1px solid var(--border-soft,var(--border)); display:flex; flex-direction:column; gap:6px; }
+  .ov-vs-h{ display:flex; align-items:center; justify-content:space-between; gap:var(--sp-2); font-size:var(--fs-xs); color:var(--text-faint); }
+  .ov-vs-h .chip{ height:22px; font-size:var(--fs-2xs); }
+  .ov-vs-r{ display:grid; grid-template-columns:30px minmax(0,1fr) auto; align-items:center; gap:var(--sp-2); font-size:var(--fs-xs); }
+  .ov-vs-r em{ font-style:normal; color:var(--text-faint); }
+  .ov-vs-r .trk{ height:7px; }
+  .ov-vs-r b{ font-weight:600; color:var(--text-dim); white-space:nowrap; }
+</style>
 </head>
 <body>
 
@@ -640,7 +657,7 @@
     Manba: <b>Odoo API — sale.order + pos.order</b><br>
     Savdo nuqtasi: <b>Hasanboy filial POS_1</b><br>
     Davr: <b>Oktabr 2026</b><br>
-    Oxirgi yangilanish: <b>27.10.2026 16:49</b>
+    Oxirgi yangilanish: <b>27.10.2026 16:54</b>
   </div>
   <button type="button" id="sbToggle" class="sb-toggle" aria-label="Yon panelni yig'ish / yoyish" title="Yig'ish / yoyish  ( [ )">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>
@@ -1425,6 +1442,19 @@ function frozenOf(fz, name){
 }
 function fmtDM(d){ return d ? d.slice(8,10)+'.'+d.slice(5,7)+'.'+d.slice(0,4) : ''; }
 
+function ovVsHtml(c, pvName, pvRange, curName){
+  if(!c || !(c.p>0)) return '';
+  const d = (c.c - c.p)/c.p*100;
+  const good = c.inv ? d<=0 : d>=0;
+  const cls = (c.neutral || Math.abs(d)<0.05) ? 'neu' : (good ? 'up' : 'dn');
+  const mx = Math.max(c.c, c.p, 1);
+  const col = cls==='dn' ? 'var(--red)' : (cls==='up' ? 'var(--green)' : 'var(--text-dim)');
+  return `<div class="ov-vs">
+    <div class="ov-vs-h"><span>${pvRange} bilan</span><span class="chip ${cls}">${d>=0?'+':'−'}${fmtNum(Math.abs(d),1)}%</span></div>
+    <div class="ov-vs-r"><em>${curName.slice(0,3)}</em><div class="trk"><div class="fill" style="width:${(c.c/mx*100).toFixed(1)}%;background:${col}"></div></div><b>${c.f(c.c)}</b></div>
+    <div class="ov-vs-r"><em>${pvName.slice(0,3)}</em><div class="trk"><div class="fill" style="width:${(c.p/mx*100).toFixed(1)}%;background:var(--text-faint);opacity:.55"></div></div><b>${c.f(c.p)}</b></div>
+  </div>`;
+}
 function renderOverview(){
   const now = REAL_TODAY;
   const mk = curMonthKey();
@@ -1555,11 +1585,24 @@ function renderOverview(){
   const byDay = aggregateByDay(orders);
   let fOld=0; orders.forEach(o=>{ if(o.unpaid>0 && ageOf(o)>15) fOld+=o.unpaid; });
   const pr = total ? paid/total*100 : 0, ur = total ? unpaid/total*100 : 0;
+  /* o'tgan oyning shu kungacha davri (bir xil filtrlar bilan) */
+  const pad2 = n => String(n).padStart(2,'0');
+  const pmD = new Date(mY, mM-1, 1);
+  const pPrefK = pmD.getFullYear()+'-'+pad2(pmD.getMonth()+1);
+  const pDimK = new Date(pmD.getFullYear(), pmD.getMonth()+1, 0).getDate();
+  const pCutK = isCur ? Math.min(el, pDimK) : pDimK;
+  let prevO = [];
+  { const sf = filters.dateFrom, st = filters.dateTo;
+    try{ filters.dateFrom = pPrefK+'-01'; filters.dateTo = pPrefK+'-'+pad2(pCutK); prevO = getFiltered(); }
+    finally{ filters.dateFrom = sf; filters.dateTo = st; } }
+  const pv = { total: prevO.reduce((s,o)=>s+o.total,0), paid: prevO.reduce((s,o)=>s+o.paid,0), unpaid: prevO.reduce((s,o)=>s+o.unpaid,0), n: prevO.length };
+  const pvName = MONTHS_UZ_FULL[pmD.getMonth()];
+  const pvRange = `${pvName} 1–${pCutK}`;
   const kp = [
-    { l:'Jami savdo', v:fmtSumShort(total), c:'var(--gold)', sp:byDay.map(d=>d.total), ch:'Bonus '+ovMoney((fzSale && orders.length===mOrders.length) ? fzSaleSum : total*BONUS_RATE), cc:'gd', n:fmtSum(total) },
-    { l:"To'langan summa", v:fmtSumShort(paid), c:'var(--green)', sp:byDay.map(d=>d.paid), ch:fmtPct(pr), cc: pr>=90?'up':'am', n:"Savdodan yig'ilgan. Bonus uchun kamida 90% kerak" },
-    { l:'Qarzdorlik', v:fmtSumShort(unpaid), c:'var(--red)', sp:byDay.map(d=>d.unpaid), ch:fmtPct(ur), cc:'dn', n: fOld>0 ? `15 kundan eski: ${fmtSumShort(fOld)} so'm` : "15 kundan eski qarz yo'q" },
-    { l:'Buyurtmalar', v:fmtNum(count)+' ta', c:'var(--text)', sp:byDay.map(d=>d.count), ch:`Chek ${fmtSumShort(avgCheck)}`, cc:'neu', n:`O'rtacha chek ${fmtSumShort(avgCheck)}` }
+    { l:'Jami savdo', v:fmtSumShort(total), c:'var(--gold)', cmp:{c:total, p:pv.total, f:fmtSumShort}, sp:byDay.map(d=>d.total), ch:'Bonus '+ovMoney((fzSale && orders.length===mOrders.length) ? fzSaleSum : total*BONUS_RATE), cc:'gd', n:fmtSum(total) },
+    { l:"To'langan summa", v:fmtSumShort(paid), c:'var(--green)', cmp:{c:paid, p:pv.paid, f:fmtSumShort, neutral:isCur}, sp:byDay.map(d=>d.paid), ch:fmtPct(pr), cc: pr>=90?'up':'am', n:"Savdodan yig'ilgan. Bonus uchun kamida 90% kerak" },
+    { l:'Qarzdorlik', v:fmtSumShort(unpaid), c:'var(--red)', cmp:{c:unpaid, p:pv.unpaid, f:fmtSumShort, inv:true, neutral:isCur}, sp:byDay.map(d=>d.unpaid), ch:fmtPct(ur), cc:'dn', n: fOld>0 ? `15 kundan eski: ${fmtSumShort(fOld)} so'm` : "15 kundan eski qarz yo'q" },
+    { l:'Buyurtmalar', v:fmtNum(count)+' ta', c:'var(--text)', cmp:{c:count, p:pv.n, f:v=>fmtNum(v)+' ta'}, sp:byDay.map(d=>d.count), ch:`Chek ${fmtSumShort(avgCheck)}`, cc:'neu', n:`O'rtacha chek ${fmtSumShort(avgCheck)}` }
   ];
   document.getElementById('overviewKpis').innerHTML = kp.map(k=>`
     <div class="kpi-card ov-kpi">
@@ -1567,6 +1610,7 @@ function renderOverview(){
       <div class="ov-kpi-mid"><div class="kpi-value" style="color:${k.c}">${ovVU(k.v)}</div>
         <svg width="112" height="32" viewBox="0 0 112 32" aria-hidden="true"><polyline points="${ovSpark(k.sp,112,32)}" style="fill:none;stroke:${k.c};stroke-width:2;stroke-linejoin:round;stroke-linecap:round"/></svg></div>
       <div class="kpi-sub">${k.n}</div>
+      ${ovVsHtml(k.cmp, pvName, pvRange, MONTHS_UZ_FULL[mM])}
     </div>`).join('');
 
   /* --- 4. Kunlik savdo va pul kirimi --- */
@@ -1674,26 +1718,15 @@ function renderOverview(){
       return `<span class="chip ${Math.abs(d)<0.05?'neu':(good?'up':'dn')}">${up?'+':'−'}${fmtNum(Math.abs(d),1)}%</span>`;
     };
     const chipPP = d => `<span class="chip ${Math.abs(d)<0.05?'neu':(d>=0?'up':'dn')}">${d>=0?'+':'−'}${fmtNum(Math.abs(d),1)} p.p.</span>`;
-    const cell = (l, a, b, ch, col) => `<div class="kpi-card ov-kpi"><div class="ov-head"><span class="lbl">${l}</span></div><div class="ov-kpi-mid"><div class="kpi-value" style="color:${col}">${/^[\d\s]+$/.test(a) ? a : ovVU(a)}</div></div><div class="kpi-sub" style="display:flex;justify-content:space-between;align-items:center;gap:var(--sp-2);flex-wrap:wrap"><span>${MONTHS_UZ_FULL[pm.getMonth()]}: ${b}</span>${ch}</div></div>`;
-    const range = (m, d) => `${MONTHS_UZ_FULL[m]} 1–${d}`;
     const hasPrev = B.n > 0;
+    const row = (l, a, b, ch) => `<div class="ov-cmp-i"><span class="l">${l}</span><b>${a}</b><span class="p">${MONTHS_UZ_FULL[pm.getMonth()]}: ${b}</span>${ch}</div>`;
     let proj = '';
     if(isCur && el>0 && A.t>0){
       const pace = A.t/el*dim;
       const pFull = agg(pPref, pDim).t;
-      proj = `<div class="ov-cmp-proj">Shu sur'atda oy oxirigacha taxminan <b>${fmtSumShort(pace)}</b> so'm savdo bo'ladi`
-        + (pFull>0 ? ` (${MONTHS_UZ_FULL[pm.getMonth()]} to'liq: ${fmtSumShort(pFull)}).` : '.') + `</div>`;
+      proj = `<div class="ov-cmp-i"><span class="l">Oy oxirigacha prognoz</span><b>${fmtSumShort(pace)}</b><span class="p">${pFull>0 ? MONTHS_UZ_FULL[pm.getMonth()]+" to'liq: "+fmtSumShort(pFull) : ''}</span></div>`;
     }
-    box.innerHTML = `
-      <div class="ov-head"><div><h2 class="h2">O'tgan oy bilan solishtirish</h2>
-        <div class="ov-sub">${hasPrev ? `${range(mM, el)} va ${range(pm.getMonth(), cutDay)}, bir xil kun soni` : "O'tgan oy uchun ma'lumot yo'q"}</div></div></div>
-      ${hasPrev ? `<div class="ov-cmp-grid">
-        ${cell('Sotilgan', fmtSumShort(A.t), fmtSumShort(B.t), chip(dl(A.t,B.t)), 'var(--gold)')}
-        ${cell("To'langan", fmtSumShort(A.p), fmtSumShort(B.p), chip(dl(A.p,B.p)), 'var(--green)')}
-        ${cell("To'lov ulushi", fmtPct(A.pct), fmtPct(B.pct), chipPP(A.pct-B.pct), A.pct>=PAY_BONUS_THRESHOLD ? 'var(--green)' : 'var(--amber)')}
-        ${cell('Buyurtmalar', fmtNum(A.n)+' ta', fmtNum(B.n)+' ta', chip(dl(A.n,B.n)), 'var(--text)')}
-        ${cell("O'rtacha chek", fmtSumShort(A.avg), fmtSumShort(B.avg), chip(dl(A.avg,B.avg)), 'var(--blue)')}
-      </div>${proj}` : ''}`;
+    box.innerHTML = hasPrev ? `<div class="ov-cmp-strip">${row("To'lov ulushi", fmtPct(A.pct), fmtPct(B.pct), chipPP(A.pct-B.pct))}${row("O'rtacha chek", fmtSumShort(A.avg), fmtSumShort(B.avg), chip(dl(A.avg,B.avg)))}${proj}</div>` : '';
   })();
 
   /* --- 10. Manba bo'yicha savdo (sale.order va POS kassa) --- */
