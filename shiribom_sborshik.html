@@ -518,6 +518,15 @@
   .drp-day.sel{ background:var(--gold); color:#14110a; font-weight:800; border-radius:var(--r-sm); }
   .drp-hint{ text-align:center; font-size:var(--fs-xs); color:var(--text-dim); margin-top:var(--sp-3); }
 </style>
+<style id="torroq-ekran">
+/* 1200 px atrofidagi ekranlar: reyting jadvali sig'adi, KPI kartochkalar 2x2 (2026-10-27) */
+@media (max-width:1500px){
+  .ov-row#overviewKpis{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .ov-tbl{ min-width:0; }
+  .ov-tr{ grid-template-columns:28px minmax(150px,1.3fr) minmax(90px,.9fr) 84px minmax(120px,1fr) 56px 84px; gap:var(--sp-3); }
+  .ov-bar b{ width:46px; }
+}
+</style>
 </head>
 <body>
 
@@ -555,7 +564,7 @@
     Manba: <b>Odoo API — stock.picking (chiqim, tovar o'tkazish)</b><br>
     Hisoblash birligi: <b>Операции/Товар (pozitsiya)</b><br>
     Davr: <b id="sidebarDavr">Avgust 2026</b><br>
-    Oxirgi yangilanish: <b>27.10.2026 12:45</b><br>
+    Oxirgi yangilanish: <b>27.10.2026 13:00</b><br>
     Bonus: <b>500 so'm / pozitsiya</b>
   </div>
   <button type="button" id="sbToggle" class="sb-toggle" aria-label="Yon panelni yig'ish / yoyish" title="Yig'ish / yoyish  ( [ )">
