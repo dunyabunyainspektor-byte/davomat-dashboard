@@ -572,6 +572,21 @@
   .ov-ins li.warn::before{ background:var(--amber); }
   .ov-ins li.bad::before{ background:var(--red); }
 </style>
+<style id="ov-ins2-css">
+  .ov-ins-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:var(--sp-4); margin-top:var(--sp-4); }
+  .ov-insc{ flex:none; min-width:0; }
+  .ov-insc .kpi-sub{ margin-top:var(--sp-3); line-height:1.5; }
+  .ov-insc .kpi-sub b{ color:var(--text); font-weight:600; }
+  .ov-mini{ display:flex; align-items:flex-end; gap:6px; height:44px; margin-top:var(--sp-3); }
+  .ov-mini-b{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; gap:3px; min-width:0; }
+  .ov-mini-b i{ display:block; width:100%; border-radius:3px 3px 0 0; min-height:2px; }
+  .ov-mini-b span{ font-size:10px; color:var(--text-faint); line-height:1; }
+  .ov-pills{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:var(--sp-3); }
+  .ov-pills em{ color:var(--text-faint); font-style:normal; font-size:var(--fs-sm); }
+  .ov-pills .chip{ height:22px; font-size:var(--fs-2xs); }
+  .ov-cmpace{ margin-top:var(--sp-3); }
+  .ov-cmpace-l{ display:flex; justify-content:space-between; gap:var(--sp-2); font-size:var(--fs-xs); color:var(--text-faint); margin-top:6px; }
+</style>
 </head>
 <body>
 
@@ -621,7 +636,7 @@
     Manba: <b>Odoo API — sale.order + pos.order</b><br>
     Savdo nuqtasi: <b>Hasanboy filial POS_1</b><br>
     Davr: <b>Oktabr 2026</b><br>
-    Oxirgi yangilanish: <b>27.10.2026 16:39</b>
+    Oxirgi yangilanish: <b>27.10.2026 16:45</b>
   </div>
   <button type="button" id="sbToggle" class="sb-toggle" aria-label="Yon panelni yig'ish / yoyish" title="Yig'ish / yoyish  ( [ )">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>
@@ -2253,52 +2268,78 @@ function renderMonthsBonus(list, mgs, AB){
 function renderMonthsInsight(list, full, mgs, AB, MN){
   const box = document.getElementById('monthsInsight'); if(!box) return;
   const now = REAL_TODAY, el = now.getDate();
-  const items = [];
   const sgn = d => (d>=0?'+':'−')+fmtNum(Math.abs(d),1)+'%';
   const dlt = (a,b) => b>0 ? (a-b)/b*100 : null;
   const cur = list.find(m=>m.cur);
+  const IC = (p) => `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${p}"/></svg>`;
+  const card = (o) => `<div class="kpi-card ov-kpi ov-insc">
+      <div class="ov-head"><span class="lbl">${o.t}</span>${o.chip||''}</div>
+      <div class="ov-kpi-mid"><div class="kpi-value" style="color:${o.c||'var(--text)'}">${o.v}</div></div>
+      ${o.vis||''}
+      <div class="kpi-sub">${o.s}</div></div>`;
+  const cards = [];
+
   if(full.length>=2){
     const avgT = full.reduce((s,m)=>s+m.t,0)/full.length;
     const best = full.reduce((a,b)=> b.t>a.t?b:a), worst = full.reduce((a,b)=> b.t<a.t?b:a);
-    items.push({c:'', h:`<b>Umumiy manzara.</b> ${AB(full[0])}–${AB(full[full.length-1])} oralig'ida ${full.length} ta to'liq oy: o'rtacha oylik savdo <b>${fmtSumShort(avgT)}</b>. Eng yuqori oy ${MN(best)} (${fmtSumShort(best.t)}), eng past oy ${MN(worst)} (${fmtSumShort(worst.t)}).`});
+    const mx = Math.max(...full.map(m=>m.t));
+    const bars = full.map(m=>`<div class="ov-mini-b" title="${MN(m)}: ${fmtSumShort(m.t)}"><i style="height:${(m.t/mx*100).toFixed(0)}%;background:${m===best?'var(--green)':(m===worst?'var(--red)':'var(--gold)')};opacity:${(m===best||m===worst)?1:.55}"></i><span>${AB(m)}</span></div>`).join('');
+    cards.push(card({t:'Umumiy manzara', v:ovVU(fmtSumShort(avgT)), c:'var(--gold)',
+      chip:`<span class="chip neu">${full.length} oy</span>`,
+      vis:`<div class="ov-mini">${bars}</div>`,
+      s:`O'rtacha oylik savdo. Eng yuqori <b>${MN(best)}</b> (${fmtSumShort(best.t)}), eng past <b>${MN(worst)}</b> (${fmtSumShort(worst.t)}).`}));
   }
   if(full.length>=2){
     const L = full[full.length-1], P = full[full.length-2];
     const dT = dlt(L.t,P.t), dN = dlt(L.n,P.n), dA = dlt(L.avg,P.avg);
-    let why = '';
-    if(dN!==null && dA!==null){
-      why = Math.abs(dN) > Math.abs(dA)
-        ? ` O'zgarish asosan buyurtmalar soni hisobiga (${sgn(dN)}), o'rtacha chek ${sgn(dA)}.`
-        : ` O'zgarish asosan o'rtacha chek hisobiga (${sgn(dA)}), buyurtmalar soni ${sgn(dN)}.`;
-    }
-    if(dT!==null) items.push({c: dT>=0?'good':'bad', h:`<b>${MN(L)}.</b> Savdo <b>${fmtSumShort(L.t)}</b>, ${MN(P)}ga nisbatan <b>${sgn(dT)}</b>.${why}`});
+    const why = (dN!==null && dA!==null) ? (Math.abs(dN)>Math.abs(dA) ? `asosan buyurtmalar soni hisobiga` : `asosan o'rtacha chek hisobiga`) : '';
+    const pill = (l, d) => d===null ? '' : `<span class="chip ${Math.abs(d)<0.05?'neu':(d>=0?'up':'dn')}">${l} ${sgn(d)}</span>`;
+    if(dT!==null) cards.push(card({t:`${MN(L)} (to'liq oy)`, v:sgn(dT), c: dT>=0?'var(--green)':'var(--red)',
+      chip:`<span class="chip neu">${MN(P)}ga nisbatan</span>`,
+      vis:`<div class="ov-pills">${pill('Savdo',dT)}${pill('Buyurtma',dN)}${pill("O'rtacha chek",dA)}</div>`,
+      s:`Savdo <b>${fmtSumShort(L.t)}</b>${why?`, o'zgarish ${why}.`:'.'}`}));
   }
   if(cur && cur.dT!==null){
-    const pace = el>0 ? cur.t/el*new Date(cur.y, cur.mi+1, 0).getDate() : 0;
     const P = full[full.length-1];
-    items.push({c: cur.dT>=0?'good':'warn', h:`<b>${MN(cur)} (joriy oy).</b> ${el} kunda <b>${fmtSumShort(cur.t)}</b> savdo, ${P?MN(P)+'ning'+' shu davriga':'o\'tgan oyga'} nisbatan <b>${sgn(cur.dT)}</b>. Shu sur'atda oy oxirigacha taxminan <b>${fmtSumShort(pace)}</b>${P?` (${MN(P)} to'liq: ${fmtSumShort(P.t)})`:''}.`});
-    if(cur.pct < 90) items.push({c:'warn', h:`<b>${MN(cur)}ning to'lov ulushi ${fmtPct(cur.pct)}.</b> O'tgan oy to'lovlari oy tugagach ham 15-sanagacha tushib turgani uchun bu raqamni o'tgan oyning yakuniy ko'rsatkichi bilan to'liq solishtirib bo'lmaydi.`});
+    const dim = new Date(cur.y, cur.mi+1, 0).getDate();
+    const pace = el>0 ? cur.t/el*dim : 0;
+    const ratio = P && P.t>0 ? Math.min(pace/P.t*100, 130) : 0;
+    cards.push(card({t:`${MN(cur)} (joriy oy)`, v:sgn(cur.dT), c: cur.dT>=0?'var(--green)':'var(--amber)',
+      chip:`<span class="chip neu">${el}/${dim} kun</span>`,
+      vis: P ? `<div class="ov-cmpace"><div class="trk" style="height:8px"><div class="fill" style="width:${Math.min(ratio,100).toFixed(1)}%;background:${ratio>=100?'var(--green)':'var(--amber)'}"></div></div><div class="ov-cmpace-l"><span>Prognoz ${fmtSumShort(pace)}</span><span>${MN(P)} ${fmtSumShort(P.t)}</span></div></div>` : '',
+      s:`${el} kunda <b>${fmtSumShort(cur.t)}</b>, ${P?MN(P)+'ning shu davriga':'o\'tgan oyga'} nisbatan. To'lov ulushi <b>${fmtPct(cur.pct)}</b>: pul 15-sanagacha tushib turadi, shuning uchun hali to'liq solishtirib bo'lmaydi.`}));
   }
   if(full.length>=3){
     const l3 = full.slice(-3);
     const low = full.filter(m=>m.pct<90);
-    const trend = l3.map(m=>fmtPct(m.pct)).join(' → ');
     const falling = l3[2].pct < l3[1].pct && l3[1].pct < l3[0].pct;
-    items.push({c: (low.length||falling)?'warn':'good', h:`<b>To'lov intizomi.</b> Oxirgi uch oyda to'lov ulushi: ${trend}.` + (falling ? ' Ulush har oy pasayib bormoqda, bu to\'lov bonusi chegarasiga (90%) yaqinlashish xavfi.' : '') + (low.length ? ` 90% dan past oylar: ${low.map(m=>MN(m)+' '+fmtPct(m.pct)).join(', ')}.` : ' Barcha to\'liq oylar 90% dan yuqori.')});
+    const cls = p => p>=97 ? 'up' : (p>=90 ? 'am' : 'dn');
+    cards.push(card({t:"To'lov intizomi", v: fmtPct(l3[2].pct), c: l3[2].pct>=90?(falling?'var(--amber)':'var(--green)'):'var(--red)',
+      chip: falling ? `<span class="chip am">pasaymoqda</span>` : `<span class="chip up">barqaror</span>`,
+      vis:`<div class="ov-pills">${l3.map((m,i)=>`<span class="chip ${cls(m.pct)}">${AB(m)} ${fmtPct(m.pct)}</span>`).join('<em>→</em>')}</div>`,
+      s: (falling ? `Ulush har oy pasayib bormoqda, bonus chegarasi (90%) yaqinlashmoqda.` : `To'lov ulushi barqaror.`) + (low.length ? ` 90% dan past: ${low.map(m=>MN(m)+' '+fmtPct(m.pct)).join(', ')}.` : ` Barcha to'liq oylar 90% dan yuqori.`)}));
   }
   const ref = full.length ? full[full.length-1] : null;
   if(ref){
     const arr = Object.keys(ref.mg).map(n=>({n, v:ref.mg[n]})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v);
     if(arr.length>=2 && ref.t>0){
-      items.push({c:'', h:`<b>Menejerlar (${MN(ref)}).</b> ` + arr.map(x=>`${ovSurname(x.n)} <b>${fmtPct(x.v/ref.t*100)}</b>`).join(', ') + `. Eng katta ulush ${ovSurname(arr[0].n)}da (${fmtSumShort(arr[0].v)}).`});
+      const OP=[1,.7,.45,.3,.2];
+      cards.push(card({t:`Menejerlar (${MN(ref)})`, v:`${fmtPct(arr[0].v/ref.t*100)}`, c:'var(--text)',
+        chip:`<span class="chip neu">${ovSurname(arr[0].n)}</span>`,
+        vis:`<div class="ov-seg" style="margin-top:var(--sp-3)">${arr.map((x,i)=>`<div style="width:${(x.v/ref.t*100).toFixed(2)}%;background:var(--gold);opacity:${OP[Math.min(i,OP.length-1)]}" title="${ovEsc(ovSurname(x.n))}: ${fmtSumShort(x.v)}"></div>`).join('')}</div>`,
+        s: arr.map(x=>`${ovSurname(x.n)} <b>${fmtPct(x.v/ref.t*100)}</b>`).join(' · ')}));
     }
   }
   const fzl = list.filter(m=>m.fz);
   if(fzl.length){
-    const t = fzl.map(m=> `${MN(m)}: <b>${fmtNum((m.bS||0)+(m.bP||0),0)}</b> so'm`).join('; ');
-    items.push({c:'', h:`<b>Bonus.</b> Muzlatilgan oylar bo'yicha berilgan bonus: ${t}. Boshqa oylar uchun rasmiy raqam kiritilgach shu yerda ko'rinadi.`});
+    const last = fzl[fzl.length-1];
+    const tot = (last.bS||0)+(last.bP||0);
+    cards.push(card({t:`Berilgan bonus (${MN(last)})`, v:fmtNum(tot,0), c:'var(--gold)',
+      chip:`<span class="chip up">muzlatilgan</span>`,
+      vis:`<div class="ov-pills"><span class="chip gd">Savdo ${last.bS===null?'—':fmtNum(last.bS,0)}</span><span class="chip ${last.bP>0?'up':'neu'}">To'lov ${last.bP===null?'—':fmtNum(last.bP,0)}</span></div>`,
+      s:`Boshqa oylar uchun rasmiy raqam kiritilgach shu yerda ko'rinadi.`}));
   }
-  box.innerHTML = `<div class="ov-head"><div><h2 class="h2">Qisqa xulosa</h2><div class="ov-sub">Ma'lumotdan avtomatik tuzilgan</div></div></div><ul class="ov-ins">${items.map(i=>`<li class="${i.c}">${i.h}</li>`).join('')}</ul>`;
+  box.innerHTML = `<div class="ov-head"><div><h2 class="h2">Qisqa xulosa</h2><div class="ov-sub">Ma'lumotdan avtomatik tuzilgan</div></div></div><div class="ov-ins-grid">${cards.join('')}</div>`;
 }
 
 function renderAll(){
