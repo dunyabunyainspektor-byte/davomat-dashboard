@@ -657,7 +657,7 @@
     Manba: <b>Odoo API — sale.order + pos.order</b><br>
     Savdo nuqtasi: <b>Hasanboy filial POS_1</b><br>
     Davr: <b>Oktabr 2026</b><br>
-    Oxirgi yangilanish: <b>27.10.2026 18:45</b>
+    Oxirgi yangilanish: <b>27.10.2026 18:47</b>
   </div>
   <button type="button" id="sbToggle" class="sb-toggle" aria-label="Yon panelni yig'ish / yoyish" title="Yig'ish / yoyish  ( [ )">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>
@@ -1432,7 +1432,7 @@ const PAY_BONUS_THRESHOLD = 90;
 /* Tasdiqlangan (muzlatilgan) bonuslar: tasdiqlangan_bonuslar.json dan (yangilash skripti joylashtiradi).
    sotuv_tasdiq: sotuv bonusi tasdiqlangan sana; pul_tasdiq: pul kirimi bonusi natijasi e'lon qilingan sana.
    Muzlatilgan oyda "Menejerlar & KPI" shu raqamlarni ko'rsatadi, Odoo'dagi keyingi o'zgarishlar ta'sir qilmaydi. */
-/*BF:START*/const BONUS_FROZEN = {"2026-08": {"sotuv_tasdiq": "2026-09-03", "pul_tasdiq": "2026-09-16", "manba": "Foydalanuvchi yuborgan avgust KPI 1 / KPI 2 jadvali; Rixsiyev jami 363 886 (sotuv 181 943 + pul 181 943). Abdiyev to'langan summa dashboarddagi 88,8% dan (taxminiy). Tasdiq sanalari TAXMINIY.", "menejerlar": {"ABDIYEV MUROD": {"sotuv": 792486000, "tolangan": 703600000, "sotuv_bonus": 792486, "pul_bonus": 0}, "ABDURAXMONOV ABDULAZIZ": {"sotuv": 999386000, "tolangan": 921996000, "sotuv_bonus": 999386, "pul_bonus": 921996}, "RIXSIYEV ABDULLOX": {"sotuv": 181943000, "tolangan": 181943000, "sotuv_bonus": 181943, "pul_bonus": 181943}}}, "2026-09": {"sotuv_tasdiq": "2026-10-03", "pul_tasdiq": "2026-10-16", "manba": "Telegram guruhga yuborilgan HASANBOY - SENTABR jadvallari (2 va 16 oktabr)", "menejerlar": {"ABDIYEV MUROD": {"sotuv": 1104921242, "tolangan": 966848149, "sotuv_bonus": 1104921, "pul_bonus": 0}, "ABDURAXMONOV ABDULAZIZ": {"sotuv": 793047370, "tolangan": 701781945, "sotuv_bonus": 793047, "pul_bonus": 0}, "RIXSIYEV ABDULLOX": {"sotuv": 188249403, "tolangan": 187852403, "sotuv_bonus": 188249, "pul_bonus": 187852}}}};/*BF:END*/
+/*BF:START*/const BONUS_FROZEN = {"2026-08": {"sotuv_tasdiq": "2026-09-03", "pul_tasdiq": "2026-09-16", "manba": "Foydalanuvchi yuborgan avgust KPI 1 / KPI 2 jadvali; Abdiyev e'lon qilingan jadvaldan (sotuv 792 484 861, pul kirimi 704 594 458, 88,9%, bonus 792 485); Rixsiyev jami 363 886. Tasdiq sanalari TAXMINIY.", "menejerlar": {"ABDIYEV MUROD": {"sotuv": 792484861, "tolangan": 704594458, "sotuv_bonus": 792485, "pul_bonus": 0}, "ABDURAXMONOV ABDULAZIZ": {"sotuv": 999386000, "tolangan": 921996000, "sotuv_bonus": 999386, "pul_bonus": 921996}, "RIXSIYEV ABDULLOX": {"sotuv": 181943000, "tolangan": 181943000, "sotuv_bonus": 181943, "pul_bonus": 181943}}}, "2026-09": {"sotuv_tasdiq": "2026-10-03", "pul_tasdiq": "2026-10-16", "manba": "Telegram guruhga yuborilgan HASANBOY - SENTABR jadvallari (2 va 16 oktabr)", "menejerlar": {"ABDIYEV MUROD": {"sotuv": 1104921242, "tolangan": 966848149, "sotuv_bonus": 1104921, "pul_bonus": 0}, "ABDURAXMONOV ABDULAZIZ": {"sotuv": 793047370, "tolangan": 701781945, "sotuv_bonus": 793047, "pul_bonus": 0}, "RIXSIYEV ABDULLOX": {"sotuv": 188249403, "tolangan": 187852403, "sotuv_bonus": 188249, "pul_bonus": 187852}}}};/*BF:END*/
 function frozenMonth(mk){ const f = BONUS_FROZEN[mk]; return (f && f.menejerlar) ? f : null; }
 function frozenOf(fz, name){
   if(!fz) return null;
