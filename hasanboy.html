@@ -621,7 +621,7 @@
     Manba: <b>Odoo API — sale.order + pos.order</b><br>
     Savdo nuqtasi: <b>Hasanboy filial POS_1</b><br>
     Davr: <b>Oktabr 2026</b><br>
-    Oxirgi yangilanish: <b>27.10.2026 16:30</b>
+    Oxirgi yangilanish: <b>27.10.2026 16:39</b>
   </div>
   <button type="button" id="sbToggle" class="sb-toggle" aria-label="Yon panelni yig'ish / yoyish" title="Yig'ish / yoyish  ( [ )">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>
@@ -2206,17 +2206,17 @@ function renderMonths(){
     <td class="num"><b>${fmtPct(tPct)}</b></td>
     <td class="num"><b>${fmtNum(T.n)}</b></td>
     <td class="num"><b>${fmtSumShort(T.n? T.t/T.n : 0)}</b></td>
-    <td class="num">${(T.anyS||T.anyP)? '<b>'+fmtNum(T.bS+T.bP,0)+'</b><div class="hint">muzlatilgan</div>' : DASH}</td></tr>` : '';
+    <td class="num">${(T.anyS||T.anyP)? '<b>'+fmtNum(T.bS+T.bP,0)+'</b>' : DASH}</td></tr>` : '';
   const tb = document.getElementById('tblMonthsBody');
   tb.innerHTML = list.slice().reverse().map(m=>`<tr>
-    <td><b>${MN(m)} ${m.y}</b>${m.cur?' <span class="hint">(oy tugamagan)</span>':''}<div style="margin-top:4px">${stat(m)}</div></td>
+    <td><b>${MN(m)} ${m.y}</b>${m.cur?' <span class="hint">(oy tugamagan)</span>':''}</td>
     <td class="num">${fmtSumShort(m.t)}</td>
     <td class="num">${chip(m.dT)}${m.cur&&m.dT!==null?'*':''}</td>
     <td class="num">${fmtSumShort(m.p)}</td>
     <td class="num" style="color:${m.pct>=90?'var(--green)':(m.pct>=60?'var(--amber)':'var(--red)')}">${fmtPct(m.pct)}</td>
     <td class="num">${fmtNum(m.n)}</td>
     <td class="num">${fmtSumShort(m.avg)}</td>
-    <td class="num">${(m.bS===null && m.bP===null) ? DASH : '<b>'+fmtNum((m.bS||0)+(m.bP||0),0)+'</b><div class="hint">savdo '+(m.bS===null?'—':fmtNum(m.bS,0))+'</div><div class="hint">to\'lov '+(m.bP===null?'—':fmtNum(m.bP,0))+'</div>'}</td></tr>`).join('') + totRow;
+    <td class="num">${(m.bS===null && m.bP===null) ? DASH : '<b>'+fmtNum((m.bS||0)+(m.bP||0),0)+'</b>'}</td></tr>`).join('') + totRow;
   const hint = document.getElementById('monthsHint');
   if(hint) hint.textContent = list.some(m=>m.cur) ? "* Joriy oy o'tgan oyning shu kungacha qismi bilan solishtirilgan" : '';
 
