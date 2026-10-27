@@ -589,7 +589,7 @@
     Manba: <b>Odoo API — sale.order + pos.order</b><br>
     Savdo nuqtasi: <b>Hasanboy filial POS_1</b><br>
     Davr: <b>Oktabr 2026</b><br>
-    Oxirgi yangilanish: <b>27.10.2026 11:30</b><br>
+    Oxirgi yangilanish: <b>27.10.2026 11:36</b><br>
     Odoo'dan har 15 daqiqada avtomatik yangilanadi.</div>
   <button type="button" id="sbToggle" class="sb-toggle" aria-label="Yon panelni yig'ish / yoyish" title="Yig'ish / yoyish  ( [ )">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>
@@ -1312,7 +1312,7 @@ const OV_DOW_FULL = ['Yakshanba','Dushanba','Seshanba','Chorshanba','Payshanba',
 
 /* Boshqa filialga o'tgan menejerlar: shu oydan boshlab ro'yxat, karta, filtr va grafiklarda ko'rinmaydi.
    Ularning o'tishdan oldingi savdosi umumiy summalarda saqlanadi (otgan_menejerlar.json bilan mos). */
-const OUT_MGRS = [{pref:'RIXSIYEV ABDULLOX', from:'2026-10'}];
+const OUT_MGRS = [];   // hozircha bo'sh: o'tgan menejerlar ham ishlagan davri uchun ko'rinadi (kerak bo'lsa {pref:'FAMILIYA ISM', from:'YYYY-MM'})
 function currentMonthPrefix(){
   const t = new Date();
   return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0');
@@ -1682,9 +1682,9 @@ function renderMgrHistory(){
   if(keys.length < 2){ box.style.display='none'; return; }
   box.style.display='';
   const names = new Set();
-  keys.forEach(k=> Object.keys(byMonth[k]).forEach(n=>{ if(!mgrHidden(n, mk)) names.add(n); }));
+  keys.forEach(k=> Object.keys(byMonth[k]).forEach(n=>{ names.add(n); }));
   const rows = [...names].map(name=>{
-    const cells = keys.map(k=>{ const v = byMonth[k][name]; return v && v.s>0 ? v : null; });
+    const cells = keys.map(k=>{ const v = byMonth[k][name]; return v && v.s>0 && !mgrHidden(name, k) ? v : null; });
     const last = cells[cells.length-1];
     return { name, cells, sortv: last ? last.s : -1 };
   }).filter(r=>r.cells.some(Boolean)).sort((a,b)=>b.sortv-a.sortv);
