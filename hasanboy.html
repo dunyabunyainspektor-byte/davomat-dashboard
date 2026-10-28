@@ -619,14 +619,18 @@
 </style>
 <style id="ov-row6-css">
 .ov-row6{ grid-column:1/-1; width:100%; display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:var(--sp-4,16px); }
-.ov-r6c{ display:flex; flex-direction:column; gap:6px; padding:var(--sp-5,20px); min-width:0; margin-bottom:0; }
-.ov-r6c .lbl{ font-size:var(--fs-xs); overflow-wrap:anywhere; }
-.ov-r6c .kpi-value{ font-size:26px; line-height:1.1; white-space:nowrap; }
+.ov-r6c{ display:grid; grid-template-columns:auto minmax(0,1fr); grid-template-rows:auto auto auto auto; column-gap:10px; row-gap:6px; align-content:start; padding:var(--sp-5,20px); min-width:0; margin-bottom:0; }
+.ov-r6c .lbl{ grid-column:1/-1; font-size:var(--fs-xs); overflow-wrap:anywhere; }
+.ov-r6c .kpi-value{ grid-column:1; grid-row:2; font-size:26px; line-height:1.1; white-space:nowrap; }
 .ov-r6c .kpi-value small, .ov-r6c .kpi-value .u{ margin-left:4px; font-size:.55em; }
+.ov-r6c .r6d{ grid-column:1; grid-row:3; }
 .ov-r6c .r6d .chip{ height:22px; font-size:var(--fs-2xs); }
-.ov-r6c .r6s{ font-size:var(--fs-sm); color:var(--text-faint); min-height:1em; }
+.ov-r6c .r6s{ grid-column:1/-1; grid-row:4; font-size:var(--fs-sm); color:var(--text-faint); min-height:1em; }
+.ov-r6c .r6v{ grid-column:2; grid-row:2/4; align-self:end; justify-self:end; width:100%; max-width:104px; min-width:0; height:50px; display:flex; align-items:flex-end; justify-content:flex-end; }
+.ov-r6c .r6v svg{ width:100%; height:46px; display:block; }
+.ov-r6c .r6v svg.r6ring{ width:48px; height:48px; flex:none; }
 @media (max-width:1400px){ .ov-row6{ grid-template-columns:repeat(3,minmax(0,1fr)); } .ov-r6c .kpi-value{ font-size:24px; } }
-@media (max-width:760px){ .ov-row6{ grid-template-columns:repeat(2,minmax(0,1fr)); } .ov-r6c .kpi-value{ font-size:22px; } }
+@media (max-width:760px){ .ov-row6{ grid-template-columns:repeat(2,minmax(0,1fr)); } .ov-r6c .kpi-value{ font-size:22px; } .ov-r6c .r6v{ max-width:70px; } }
 </style>
 </head>
 <body>
@@ -677,7 +681,7 @@
     Manba: <b>Odoo API — sale.order + pos.order</b><br>
     Savdo nuqtasi: <b>Hasanboy filial POS_1</b><br>
     Davr: <b>Oktabr 2026</b><br>
-    Oxirgi yangilanish: <b>28.10.2026 14:35</b>
+    Oxirgi yangilanish: <b>28.10.2026 14:45</b>
   </div>
   <button type="button" id="sbToggle" class="sb-toggle" aria-label="Yon panelni yig'ish / yoyish" title="Yig'ish / yoyish  ( [ )">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>
@@ -1667,8 +1671,26 @@ function renderOverview(){
     { l:'Buyurtmalar', v:fmtNum(count), c:'var(--text)', ch:rd(count,pv.n), s:sv(fmtNum(pv.n)) },
     { l:"O'rtacha chek", v:fmtNum(avgCheck), c:'var(--text)', ch:rd(avgCheck,prAvg), s:sv(fmtNum(prAvg)) }
   ];
-  document.getElementById('overviewKpis').innerHTML = `<div class="ov-row6">${r6.map(k=>`
-    <div class="panel ov-r6c"><span class="lbl">${k.l}</span><div class="kpi-value" style="color:${k.c}">${k.v}</div><div class="r6d">${k.ch}</div><span class="r6s">${k.s}</span></div>`).join('')}</div>`;
+  /* mini grafiklar: tanlangan davr kunlari bo'yicha, o'tgan oyning xuddi shu kunlari bilan */
+  const nDays = pCutK - pFromK + 1;
+  const dayArr = (list, key, from, n) => { const a = new Array(n).fill(0); list.forEach(o=>{ if(!o.dt || o.source==='frozen') return; const i = o.dt.getDate()-from; if(i>=0 && i<n) a[i] += (key==='count' ? 1 : (o[key]||0)); }); return a; };
+  const cumA = a => { let t=0; return a.map(v=>t+=v); };
+  const vizOk = nDays>=3 && !(orders.length && orders.every(o=>o.source==='frozen'));
+  const nCur = Math.min(nDays, Math.max(1, selTo - selFrom + 1));
+  const VW=104, VH=46;
+  const vLine = (arr,mx,col,dash,sw) => arr.length<2 ? '' : `<polyline points="${arr.map((v,i)=>(i/(arr.length-1)*VW).toFixed(1)+','+(VH-2-(mx>0?v/mx:0)*(VH-6)).toFixed(1)).join(' ')}" fill="none" stroke="${col}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"${dash?' stroke-dasharray="3 3"':''} vector-effect="non-scaling-stroke"/>`;
+  const vSpark = (cur,prv,col) => { const mx=Math.max(...cur,...prv,1); const ar=`<polygon points="0,${VH} ${cur.map((v,i)=>(i/(cur.length-1)*VW).toFixed(1)+','+(VH-2-v/mx*(VH-6)).toFixed(1)).join(' ')} ${VW},${VH}" fill="${col}" opacity=".13"/>`; return `<svg viewBox="0 0 ${VW} ${VH}" preserveAspectRatio="none" aria-hidden="true">${ar}${vLine(prv,mx,'var(--text-faint)',true,1.3)}${vLine(cur,mx,col,false,2.2)}</svg>`; };
+  const vBars = (cur,prv,col) => { const mx=Math.max(...cur,...prv,1), n=cur.length, bw=VW/n; return `<svg viewBox="0 0 ${VW} ${VH}" preserveAspectRatio="none" aria-hidden="true">${cur.map((v,i)=>`<rect x="${(i*bw+.4).toFixed(1)}" y="${(VH-v/mx*(VH-3)).toFixed(1)}" width="${Math.max(bw-1,.8).toFixed(1)}" height="${(v/mx*(VH-3)).toFixed(1)}" fill="${col}" opacity=".85"/>`).join('')}${vLine(prv,mx,'var(--text-faint)',true,1.2)}</svg>`; };
+  const vRing = (p,ref,col) => { const r=19,C=2*Math.PI*r,v=Math.min(Math.max(p,0),100)/100*C, a=ref/100*2*Math.PI-Math.PI/2; const mk = ref>0 ? `<line x1="${(24+14.5*Math.cos(a)).toFixed(1)}" y1="${(24+14.5*Math.sin(a)).toFixed(1)}" x2="${(24+23*Math.cos(a)).toFixed(1)}" y2="${(24+23*Math.sin(a)).toFixed(1)}" stroke="var(--text)" stroke-width="2.2"/>` : ''; return `<svg viewBox="0 0 48 48" class="r6ring" aria-hidden="true"><circle cx="24" cy="24" r="${r}" fill="none" stroke="var(--track)" stroke-width="6"/><circle cx="24" cy="24" r="${r}" fill="none" stroke="${col}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${v.toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 24 24)"/>${mk}</svg>`; };
+  let VZ = [null,null,null,null,null,null];
+  if(vizOk){
+    const cT = dayArr(orders,'total',selFrom,nCur), cP = dayArr(orders,'paid',selFrom,nCur), cU = dayArr(orders,'unpaid',selFrom,nCur), cN = dayArr(orders,'count',selFrom,nCur);
+    const pT = dayArr(prevO,'total',pFromK,nCur), pP = dayArr(prevO,'paid',pFromK,nCur), pU = dayArr(prevO,'unpaid',pFromK,nCur), pN = dayArr(prevO,'count',pFromK,nCur);
+    const avg = (t,n)=>t.map((v,i)=>n[i]? v/n[i] : 0);
+    VZ = [ vSpark(cumA(cT),cumA(pT),'var(--gold)'), vSpark(cumA(cP),cumA(pP),'var(--green)'), vRing(pr,prPct,pr>=PAY_BONUS_THRESHOLD?'var(--green)':'var(--red)'), vSpark(cumA(cU),cumA(pU),'var(--red)'), vSpark(cumA(cN),cumA(pN),'var(--gold)'), vBars(avg(cT,cN),avg(pT,pN),'var(--green)') ];
+  }
+  document.getElementById('overviewKpis').innerHTML = `<div class="ov-row6">${r6.map((k,ix)=>`
+    <div class="panel ov-r6c"><span class="lbl">${k.l}</span><div class="kpi-value" style="color:${k.c}">${k.v}</div><div class="r6d">${k.ch}</div><span class="r6s">${k.s}</span>${VZ[ix]?`<div class="r6v">${VZ[ix]}</div>`:''}</div>`).join('')}</div>`;
 
   /* --- 4. Kunlik savdo va pul kirimi --- */
   const sameMonth = byDay.length>0 && byDay.every(d=>d.date && d.date.getMonth()===byDay[0].date.getMonth());
