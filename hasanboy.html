@@ -617,23 +617,18 @@
 .mg-bonus > div:not(.mg-bt) > b{ margin-top:0; align-self:start; }
 .mg-bonus .mg-bt{ grid-row:3; margin-top:var(--sp-2); }
 </style>
-<style id="kpi-calm-css">
-.ov-kpi .ov-kpi-mid{ display:block; }
-.ov-kpi .kpi-sub{ margin-top:var(--sp-2); }
-.ov-kpi{ display:flex; flex-direction:column; }
-.ov-vs{ gap:0; margin-top:auto; }
-.ov-kpi .kpi-sub{ margin-bottom:var(--sp-4); }
-.ov-vs-h{ min-height:24px; }
-.ov-vs-v{ display:flex; justify-content:space-between; align-items:baseline; gap:var(--sp-2); margin-top:var(--sp-2); font-size:var(--fs-xs); color:var(--text-faint); }
-.ov-vs-v b{ font-size:var(--fs-sm); font-weight:600; color:var(--text-dim); white-space:nowrap; }
-.ov-cmp-strip{ display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:var(--sp-4) 0; }
-.ov-cmp-i{ display:grid; grid-template-columns:auto auto; justify-content:space-between; align-items:center; row-gap:var(--sp-1); padding:0 var(--sp-5); border-left:1px solid var(--border-soft,var(--border)); }
-.ov-cmp-i:first-child{ border-left:0; padding-left:0; }
-.ov-cmp-i .l{ grid-column:1 / -1; }
-.ov-cmp-i b{ font-size:var(--fs-lg,18px); }
-.ov-cmp-i .p{ grid-column:1; font-size:var(--fs-xs); color:var(--text-faint); }
-.ov-cmp-i .chip{ grid-column:2; grid-row:2; justify-self:end; }
-@media (max-width:700px){ .ov-cmp-i{ border-left:0; padding:0; } }
+<style id="ov-row6-css">
+.ov-row6{ grid-column:1/-1; width:100%; display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); padding:var(--sp-5,22px) 0; }
+.ov-r6c{ display:flex; flex-direction:column; gap:6px; padding:0 var(--sp-5,20px); border-left:1px solid var(--border-soft,var(--border)); min-width:0; }
+.ov-r6c:first-child{ border-left:0; }
+.ov-r6c .lbl{ font-size:var(--fs-xs); }
+.ov-r6c .kpi-value{ font-size:26px; line-height:1.1; white-space:nowrap; }
+.ov-r6c .r6d .chip{ height:22px; font-size:var(--fs-2xs); }
+.ov-r6c .r6s{ font-size:var(--fs-sm); color:var(--text-faint); min-height:1em; }
+@media (max-width:1400px){ .ov-row6{ grid-template-columns:repeat(3,minmax(0,1fr)); row-gap:var(--sp-5,22px); } .ov-r6c:nth-child(4){ border-left:0; } .ov-r6c .kpi-value{ font-size:24px; } }
+@media (max-width:760px){ .ov-row6{ grid-template-columns:repeat(2,minmax(0,1fr)); } .ov-r6c{ border-left:0 !important; } .ov-r6c .kpi-value{ font-size:22px; } }
+.ov-r6c .kpi-value small, .ov-r6c .kpi-value .u{ margin-left:4px; font-size:.55em; }
+.ov-r6c .lbl{ overflow-wrap:anywhere; }
 </style>
 </head>
 <body>
@@ -684,7 +679,7 @@
     Manba: <b>Odoo API — sale.order + pos.order</b><br>
     Savdo nuqtasi: <b>Hasanboy filial POS_1</b><br>
     Davr: <b>Oktabr 2026</b><br>
-    Oxirgi yangilanish: <b>28.10.2026 13:45</b>
+    Oxirgi yangilanish: <b>28.10.2026 13:49</b>
   </div>
   <button type="button" id="sbToggle" class="sb-toggle" aria-label="Yon panelni yig'ish / yoyish" title="Yig'ish / yoyish  ( [ )">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>
@@ -1502,7 +1497,8 @@ function ovVsHtml(c, pvName, pvRange, curName){
   const col = cls==='dn' ? 'var(--red)' : (cls==='up' ? 'var(--green)' : 'var(--text-dim)');
   return `<div class="ov-vs">
     <div class="ov-vs-h"><span>${pvRange} bilan</span><span class="chip ${cls}">${d>=0?'+':'−'}${fmtNum(Math.abs(d),1)}%</span></div>
-    <div class="ov-vs-v"><span>${pvName}</span><b>${c.f(c.p)}</b></div>
+    <div class="ov-vs-r"><em>${curName.slice(0,3)}</em><div class="trk"><div class="fill" style="width:${(c.c/mx*100).toFixed(1)}%;background:${col}"></div></div><b>${c.f(c.c)}</b></div>
+    <div class="ov-vs-r"><em>${pvName.slice(0,3)}</em><div class="trk"><div class="fill" style="width:${(c.p/mx*100).toFixed(1)}%;background:var(--text-faint);opacity:.55"></div></div><b>${c.f(c.p)}</b></div>
   </div>`;
 }
 function renderOverview(){
@@ -1652,19 +1648,26 @@ function renderOverview(){
   const pvName = MONTHS_UZ_FULL[pmD.getMonth()];
   const pvRange = `${pvName} 1–${pCutK}`;
   const kp = [
-    { l:'Jami savdo', v:fmtSumShort(total), c:'var(--gold)', cmp:{c:total, p:pv.total, f:fmtSumShort}, ch:'', cc:'', n:fmtSum(total)+". Bonus "+ovMoney((fzSale && orders.length===mOrders.length) ? fzSaleSum : total*BONUS_RATE) },
-    { l:"To'langan summa", v:fmtSumShort(paid), c:'var(--green)', cmp:{c:paid, p:pv.paid, f:fmtSumShort, neutral:isCur}, ch:fmtPct(pr), cc: pr>=90?'up':'am', n:"Bonus uchun kamida 90% kerak" },
-    { l:'Qarzdorlik', v:fmtSumShort(unpaid), c:'var(--red)', cmp:(isCur?null:{c:unpaid, p:pv.unpaid, f:fmtSumShort, inv:true}), ch:fmtPct(ur)+' savdodan', cc:(ur>10?'dn':'up'), n: fOld>0 ? `15 kundan eski: ${fmtSumShort(fOld)} so'm` : "15 kundan eski qarz yo'q" },
-    { l:'Buyurtmalar', v:fmtNum(count)+' ta', c:'var(--text)', cmp:{c:count, p:pv.n, f:v=>fmtNum(v)+' ta'}, ch:'', cc:'', n:`O'rtacha chek ${fmtSumShort(avgCheck)}` }
+    { l:'Jami savdo', v:fmtSumShort(total), c:'var(--gold)', cmp:{c:total, p:pv.total, f:fmtSumShort}, sp:byDay.map(d=>d.total), ch:'Bonus '+ovMoney((fzSale && orders.length===mOrders.length) ? fzSaleSum : total*BONUS_RATE), cc:'gd', n:fmtSum(total) },
+    { l:"To'langan summa", v:fmtSumShort(paid), c:'var(--green)', cmp:{c:paid, p:pv.paid, f:fmtSumShort, neutral:isCur}, sp:byDay.map(d=>d.paid), ch:fmtPct(pr), cc: pr>=90?'up':'am', n:"Savdodan yig'ilgan. Bonus uchun kamida 90% kerak" },
+    { l:'Qarzdorlik', v:fmtSumShort(unpaid), c:'var(--red)', cmp:{c:unpaid, p:pv.unpaid, f:fmtSumShort, inv:true, neutral:isCur}, sp:byDay.map(d=>d.unpaid), ch:fmtPct(ur), cc:'dn', n: fOld>0 ? `15 kundan eski: ${fmtSumShort(fOld)} so'm` : "15 kundan eski qarz yo'q" },
+    { l:'Buyurtmalar', v:fmtNum(count)+' ta', c:'var(--text)', cmp:{c:count, p:pv.n, f:v=>fmtNum(v)+' ta'}, sp:byDay.map(d=>d.count), ch:`Chek ${fmtSumShort(avgCheck)}`, cc:'neu', n:`O'rtacha chek ${fmtSumShort(avgCheck)}` }
   ];
-  document.getElementById('overviewKpis').innerHTML = kp.map(k=>`
-    <div class="kpi-card ov-kpi">
-      <div class="ov-head"><span class="lbl">${k.l}</span>${k.ch?`<span class="chip ${k.cc}">${k.ch}</span>`:''}</div>
-      <div class="ov-kpi-mid"><div class="kpi-value" style="color:${k.c}">${ovVU(k.v)}</div>
-</div>
-      <div class="kpi-sub">${k.n}</div>
-      ${ovVsHtml(k.cmp, pvName, pvRange, MONTHS_UZ_FULL[mM])}
-    </div>`).join('');
+  const rd = (c,p,inv) => { if(!(p>0)) return '<span class="chip neu">—</span>'; const d=(c-p)/p*100, up=d>=0, good=inv?!up:up; return `<span class="chip ${Math.abs(d)<0.05?'neu':(good?'up':'dn')}">${up?'▲':'▼'} ${fmtNum(Math.abs(d),1)}%</span>`; };
+  const prPct = pv.total ? pv.paid/pv.total*100 : 0, prAvg = pv.n ? pv.total/pv.n : 0;
+  const ppd = pv.total ? pr - prPct : null;
+  const ppChip = ppd===null ? '<span class="chip neu">—</span>' : `<span class="chip ${Math.abs(ppd)<0.05?'neu':(ppd>=0?'up':'dn')}">${ppd>=0?'▲':'▼'} ${fmtNum(Math.abs(ppd),1)} punkt</span>`;
+  const sv = t => pv.total>0 ? `${pvName.slice(0,3)==='Sen'?'Sentabr':pvName} ${t}` : '';
+  const r6 = [
+    { l:'Jami savdo', v:ovVU(fmtSumShort(total)), c:'var(--gold)', ch:rd(total,pv.total), s:sv(fmtSumShort(pv.total).replace(/\s*(mlrd|mln)$/,'')) },
+    { l:"To'langan", v:ovVU(fmtSumShort(paid)), c:'var(--green)', ch:rd(paid,pv.paid), s:sv(fmtSumShort(pv.paid).replace(/\s*(mlrd|mln)$/,'')) },
+    { l:"To'lov ulushi", v:fmtPct(pr), c:'var(--text)', ch:ppChip, s:sv(fmtPct(prPct)) },
+    { l:'Qarzdorlik', v:ovVU(fmtSumShort(unpaid)), c:'var(--red)', ch:`<span class="chip neu">${fmtPct(ur)} savdodan</span>`, s:sv(fmtSumShort(pv.unpaid).replace(/\s*(mlrd|mln)$/,'')) },
+    { l:'Buyurtmalar', v:fmtNum(count), c:'var(--text)', ch:rd(count,pv.n), s:sv(fmtNum(pv.n)) },
+    { l:"O'rtacha chek", v:fmtNum(avgCheck), c:'var(--text)', ch:rd(avgCheck,prAvg), s:sv(fmtNum(prAvg)) }
+  ];
+  document.getElementById('overviewKpis').innerHTML = `<div class="panel ov-row6" style="flex:1 1 100%">${r6.map(k=>`
+    <div class="ov-r6c"><span class="lbl">${k.l}</span><div class="kpi-value" style="color:${k.c}">${k.v}</div><div class="r6d">${k.ch}</div><span class="r6s">${k.s}</span></div>`).join('')}</div>`;
 
   /* --- 4. Kunlik savdo va pul kirimi --- */
   const sameMonth = byDay.length>0 && byDay.every(d=>d.date && d.date.getMonth()===byDay[0].date.getMonth());
@@ -1779,7 +1782,8 @@ function renderOverview(){
       const pFull = agg(pPref, pDim).t;
       proj = `<div class="ov-cmp-i"><span class="l">Oy oxirigacha prognoz</span><b>${fmtSumShort(pace)}</b><span class="p">${pFull>0 ? MONTHS_UZ_FULL[pm.getMonth()]+" to'liq: "+fmtSumShort(pFull) : ''}</span></div>`;
     }
-    box.innerHTML = hasPrev ? `<div class="ov-cmp-strip">${row("To'lov ulushi", fmtPct(A.pct), fmtPct(B.pct), chipPP(A.pct-B.pct))}${row("O'rtacha chek", fmtSumShort(A.avg), fmtSumShort(B.avg), chip(dl(A.avg,B.avg)))}${proj}</div>` : '';
+    box.innerHTML = '';  /* endi KPI qatoriga kiritilgan */
+    void (hasPrev ? `<div class="ov-cmp-strip">${row("To'lov ulushi", fmtPct(A.pct), fmtPct(B.pct), chipPP(A.pct-B.pct))}${row("O'rtacha chek", fmtSumShort(A.avg), fmtSumShort(B.avg), chip(dl(A.avg,B.avg)))}${proj}</div>` : '');
   })();
 
   /* --- 10. Manba bo'yicha savdo (sale.order va POS kassa) --- */
