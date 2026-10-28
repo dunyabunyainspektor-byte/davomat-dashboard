@@ -618,17 +618,15 @@
 .mg-bonus .mg-bt{ grid-row:3; margin-top:var(--sp-2); }
 </style>
 <style id="ov-row6-css">
-.ov-row6{ grid-column:1/-1; width:100%; display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); padding:var(--sp-5,22px) 0; }
-.ov-r6c{ display:flex; flex-direction:column; gap:6px; padding:0 var(--sp-5,20px); border-left:1px solid var(--border-soft,var(--border)); min-width:0; }
-.ov-r6c:first-child{ border-left:0; }
-.ov-r6c .lbl{ font-size:var(--fs-xs); }
+.ov-row6{ grid-column:1/-1; width:100%; display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:var(--sp-4,16px); }
+.ov-r6c{ display:flex; flex-direction:column; gap:6px; padding:var(--sp-5,20px); min-width:0; margin-bottom:0; }
+.ov-r6c .lbl{ font-size:var(--fs-xs); overflow-wrap:anywhere; }
 .ov-r6c .kpi-value{ font-size:26px; line-height:1.1; white-space:nowrap; }
+.ov-r6c .kpi-value small, .ov-r6c .kpi-value .u{ margin-left:4px; font-size:.55em; }
 .ov-r6c .r6d .chip{ height:22px; font-size:var(--fs-2xs); }
 .ov-r6c .r6s{ font-size:var(--fs-sm); color:var(--text-faint); min-height:1em; }
-@media (max-width:1400px){ .ov-row6{ grid-template-columns:repeat(3,minmax(0,1fr)); row-gap:var(--sp-5,22px); } .ov-r6c:nth-child(4){ border-left:0; } .ov-r6c .kpi-value{ font-size:24px; } }
-@media (max-width:760px){ .ov-row6{ grid-template-columns:repeat(2,minmax(0,1fr)); } .ov-r6c{ border-left:0 !important; } .ov-r6c .kpi-value{ font-size:22px; } }
-.ov-r6c .kpi-value small, .ov-r6c .kpi-value .u{ margin-left:4px; font-size:.55em; }
-.ov-r6c .lbl{ overflow-wrap:anywhere; }
+@media (max-width:1400px){ .ov-row6{ grid-template-columns:repeat(3,minmax(0,1fr)); } .ov-r6c .kpi-value{ font-size:24px; } }
+@media (max-width:760px){ .ov-row6{ grid-template-columns:repeat(2,minmax(0,1fr)); } .ov-r6c .kpi-value{ font-size:22px; } }
 </style>
 </head>
 <body>
@@ -679,7 +677,7 @@
     Manba: <b>Odoo API — sale.order + pos.order</b><br>
     Savdo nuqtasi: <b>Hasanboy filial POS_1</b><br>
     Davr: <b>Oktabr 2026</b><br>
-    Oxirgi yangilanish: <b>28.10.2026 14:00</b>
+    Oxirgi yangilanish: <b>28.10.2026 14:08</b>
   </div>
   <button type="button" id="sbToggle" class="sb-toggle" aria-label="Yon panelni yig'ish / yoyish" title="Yig'ish / yoyish  ( [ )">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>
@@ -1669,8 +1667,8 @@ function renderOverview(){
     { l:'Buyurtmalar', v:fmtNum(count), c:'var(--text)', ch:rd(count,pv.n), s:sv(fmtNum(pv.n)) },
     { l:"O'rtacha chek", v:fmtNum(avgCheck), c:'var(--text)', ch:rd(avgCheck,prAvg), s:sv(fmtNum(prAvg)) }
   ];
-  document.getElementById('overviewKpis').innerHTML = `<div class="panel ov-row6" style="flex:1 1 100%">${r6.map(k=>`
-    <div class="ov-r6c"><span class="lbl">${k.l}</span><div class="kpi-value" style="color:${k.c}">${k.v}</div><div class="r6d">${k.ch}</div><span class="r6s">${k.s}</span></div>`).join('')}</div>`;
+  document.getElementById('overviewKpis').innerHTML = `<div class="ov-row6">${r6.map(k=>`
+    <div class="panel ov-r6c"><span class="lbl">${k.l}</span><div class="kpi-value" style="color:${k.c}">${k.v}</div><div class="r6d">${k.ch}</div><span class="r6s">${k.s}</span></div>`).join('')}</div>`;
 
   /* --- 4. Kunlik savdo va pul kirimi --- */
   const sameMonth = byDay.length>0 && byDay.every(d=>d.date && d.date.getMonth()===byDay[0].date.getMonth());
