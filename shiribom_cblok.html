@@ -573,7 +573,7 @@ const BRAND_NAME = "Shiribom C/E blok";
     Manba: <b>Odoo API — stock.picking (chiqim, tovar o'tkazish)</b><br>
     Hisoblash birligi: <b>Операции/Товар (pozitsiya)</b><br>
     Davr: <b id="footDateRange">—</b><br>
-    Oxirgi yangilanish: <b>31.10.2026 18:30</b><br>
+    Oxirgi yangilanish: <b>31.10.2026 18:45</b><br>
     Bonus: <b>500 so'm / pozitsiya</b>
   </div>
   <button type="button" id="sbToggle" class="sb-toggle" aria-label="Yon panelni yig'ish / yoyish" title="Yig'ish / yoyish  ( [ )">
@@ -1028,7 +1028,7 @@ function aggregateByPicker(docs){
 
 // ---------- rank change (compared against last known snapshot) ----------
 // Snapshot = each picker's cumulative total pozitsiya as of the previous dashboard refresh.
-const PREV_SNAPSHOT = {"SHOALIMOV SHOBILOL O‘KTAMJON O‘G‘LI": 11352, "MANNOPOV BEKZOD RUSTAM O‘G‘LI": 3262, "KARIMOV ABDURAHMON ODILJON O‘G‘LI": 1255, "OBIDOV MAHMUDJON MURODJON O‘G‘LI": 9112, "SULTANMAXMUDOV AXMADJON SOBIT O‘G‘LI": 4145, "MUSLIMOV OZODBEK SHUXRAT O‘G‘LI": 476, "SADIKOV MIRAZIZ YUNUSOVICH": 248, "KOZIMBEKOV FOZILBEK FOTIKBEK O‘G‘LI": 1618, "BADALOV SARDOR SANJAR O‘G‘LI": 1425, "EGAMBERDIYEV ANVARBEK ULUG‘BEK O‘G‘LI": 1107, "VAHOBJONOV BEKZOD BAXTIYORJON O‘G‘LI": 953, "ILXAMOV ULUGBEK TURABEKOVICH": 54, "SHAVKATOV XAMIDULLA SUR'ATILLA O‘G‘LI": 169, "YUNUSOV MUXAMMAD AKMAL O‘G‘LI": 939, "ZOKIROV ABRORJON ANVARJON O‘G‘LI": 448};
+const PREV_SNAPSHOT = {"SHOALIMOV SHOBILOL O‘KTAMJON O‘G‘LI": 11352, "MANNOPOV BEKZOD RUSTAM O‘G‘LI": 3262, "KARIMOV ABDURAHMON ODILJON O‘G‘LI": 1255, "OBIDOV MAHMUDJON MURODJON O‘G‘LI": 9112, "SULTANMAXMUDOV AXMADJON SOBIT O‘G‘LI": 4147, "MUSLIMOV OZODBEK SHUXRAT O‘G‘LI": 476, "SADIKOV MIRAZIZ YUNUSOVICH": 248, "KOZIMBEKOV FOZILBEK FOTIKBEK O‘G‘LI": 1618, "BADALOV SARDOR SANJAR O‘G‘LI": 1425, "EGAMBERDIYEV ANVARBEK ULUG‘BEK O‘G‘LI": 1107, "VAHOBJONOV BEKZOD BAXTIYORJON O‘G‘LI": 963, "ILXAMOV ULUGBEK TURABEKOVICH": 54, "SHAVKATOV XAMIDULLA SUR'ATILLA O‘G‘LI": 169, "YUNUSOV MUXAMMAD AKMAL O‘G‘LI": 939, "ZOKIROV ABRORJON ANVARJON O‘G‘LI": 448};
 const ALL_DATES = [...new Set(RAW_DOCS.map(d=>d.dkey))].filter(k=>k!=='noma-lum').sort();
 const TODAY_KEY = ALL_DATES[ALL_DATES.length-1];
 const totalsAllTime = aggregateByPicker(RAW_DOCS).sort((a,b)=>b.positions-a.positions);
