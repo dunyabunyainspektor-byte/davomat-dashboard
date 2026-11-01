@@ -562,7 +562,7 @@ const BRAND_NAME = "Qorasaroy yiğuvçi";
     </button>
     <button class="tab-btn" data-tab="chiqim">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v14"/></svg>
-      Chiqim hujjatlari
+      Çiqim hujjatlari
     </button>
     <button class="tab-btn" data-tab="otkazish">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 7h11M18 7l-3-3M18 7l-3 3"/><path d="M17 17H6M6 17l3 3M6 17l3-3"/></svg>
@@ -573,7 +573,7 @@ const BRAND_NAME = "Qorasaroy yiğuvçi";
     Manba: <b>Odoo API — stock.picking (chiqim, tovar o'tkazish)</b><br>
     Hisoblaş birligi: <b>Операции/Товар (pozitsiya)</b><br>
     Davr: <b id="footDateRange">—</b><br>
-    Oxirgi yangilanish: <b>01.11.2026 14:27</b><br>
+    Oxirgi yangilanish: <b>01.11.2026 14:52</b><br>
     Bonus: <b>500 söm / pozitsiya</b>
   </div>
   <button type="button" id="sbToggle" class="sb-toggle" aria-label="Yon panelni yiğiş / yoyiş" title="Yiğiş / yoyiş  ( [ )">
@@ -604,7 +604,7 @@ const BRAND_NAME = "Qorasaroy yiğuvçi";
       <select id="f-picker"><option value="">Barça yiğuvçilar</option></select>
       <select id="f-type">
         <option value="">Turi — barçasi</option>
-        <option value="chiqim">Chiqim</option>
+        <option value="chiqim">Çiqim</option>
         <option value="otkazish">Tovar ötkaziş</option>
       </select>
       </div>
@@ -617,7 +617,7 @@ const BRAND_NAME = "Qorasaroy yiğuvçi";
       <div class="kpi-grid" id="overviewKpis"></div>
       <div class="grid-2">
         <div class="panel">
-          <div class="panel-head"><h2>Kunlik pozitsiyalar dinamikasi</h2><span class="hint">Chiqim + Tovar ötkaziş, kunlar böyiça</span></div>
+          <div class="panel-head"><h2>Kunlik pozitsiyalar dinamikasi</h2><span class="hint">Çiqim + Tovar ötkaziş, kunlar böyiça</span></div>
           <div class="chart-box"><canvas id="chartDailyOverview"></canvas></div>
         </div>
         <div class="panel">
@@ -645,10 +645,10 @@ const BRAND_NAME = "Qorasaroy yiğuvçi";
           <b style="color:var(--amber)">Diqqat:</b> Yiğuvçilar uçun bonus mahsulot sonidan (Операции/Количество) emas, balki har bir hujjatdagi <b>pozitsiyalar soni</b>dan (Операции/Товар qatorlari) hisoblanadi.
         </p>
         <p class="dim" style="line-height:1.7; font-size:13px; margin-top:10px;">
-          Har bir pozitsiya uçun: <b style="color:var(--gold)">500 söm</b> — bu qoida ham <b>Chiqim</b> hujjatlariga, ham <b>Tovar ötkaziş</b> hujjatlariga birdek qöllaniladi.
+          Har bir pozitsiya uçun: <b style="color:var(--gold)">500 söm</b> — bu qoida ham <b>Çiqim</b> hujjatlariga, ham <b>Tovar ötkaziş</b> hujjatlariga birdek qöllaniladi.
         </p>
         <p class="dim" style="line-height:1.7; font-size:13px; margin-top:10px;">
-          Jami bonus = (Chiqim pozitsiyalari + Tovar ötkaziş pozitsiyalari) × 500 söm. Uşbu blok butun davr ma'lumotlariga asoslanadi (filtrlardan mustaqil). Yiğuvçilar <b>Responsible Picker</b> ustuni böyiça aniqlanadi.
+          Jami bonus = (Çiqim pozitsiyalari + Tovar ötkaziş pozitsiyalari) × 500 söm. Uşbu blok butun davr ma'lumotlariga asoslanadi (filtrlardan mustaqil). Yiğuvçilar <b>Responsible Picker</b> ustuni böyiça aniqlanadi.
         </p>
         <p class="dim" style="line-height:1.7; font-size:13px; margin-top:10px;">
           Har kuni ma'lumot yangilanganda, keçagi kunga nisbatan bugungi reytingdagi <b>örin özgarişi</b> (neça poğona kötarilgan yoki tuşgan) har bir kartoçkada körsatiladi — bu yiğuvçilar orasida içki raqobatni kuçaytiriş uçun.
@@ -669,7 +669,7 @@ const BRAND_NAME = "Qorasaroy yiğuvçi";
             <thead><tr>
               <th data-sort="date">Sana</th>
               <th data-sort="docs" class="num">Hujjatlar</th>
-              <th data-sort="chiqim_pos" class="num">Chiqim pozitsiya</th>
+              <th data-sort="chiqim_pos" class="num">Çiqim pozitsiya</th>
               <th data-sort="otk_pos" class="num">Tovar ötk. pozitsiya</th>
               <th data-sort="positions" class="num">Jami pozitsiya</th>
               <th data-sort="bonus" class="num">Bonus</th>
@@ -683,7 +683,7 @@ const BRAND_NAME = "Qorasaroy yiğuvçi";
     <div class="view" id="view-chiqim">
       <div class="kpi-grid" id="chiqimKpis"></div>
       <div class="panel">
-        <div class="panel-head"><h2>Chiqim hujjatlari</h2><span class="hint" id="chiqimHint"></span></div>
+        <div class="panel-head"><h2>Çiqim hujjatlari</h2><span class="hint" id="chiqimHint"></span></div>
         <div class="table-wrap" style="max-height:640px; overflow-y:auto;">
           <table id="tblChiqim">
             <thead><tr>
@@ -872,7 +872,7 @@ function safeChart(id, canvasId, config){
 
 const TAB_TITLES = {
   overview:'Umumiy holat', pickers:"Yiğuvçilar & KPI", daily:'Kunlik faoliyat',
-  chiqim:'Chiqim hujjatlari', otkazish:"Tovar ötkaziş"
+  chiqim:'Çiqim hujjatlari', otkazish:"Tovar ötkaziş"
 };
 document.querySelectorAll('.tab-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
@@ -1008,7 +1008,7 @@ function aggregateByPicker(docs){
 
 // ---------- rank change (compared against last known snapshot) ----------
 // Snapshot = each picker's cumulative total pozitsiya as of the previous dashboard refresh.
-const PREV_SNAPSHOT = {"MANNOPOV BEKZOD RUSTAM O‘G‘LI": 278, "MUXAMEDOV LUTFULLA ABDUSAMATOVICH": 316, "YANIN FIRDAVS MAXAMADJONOVICH": 404};
+const PREV_SNAPSHOT = {"MANNOPOV BEKZOD RUSTAM O‘G‘LI": 386, "MUXAMEDOV LUTFULLA ABDUSAMATOVICH": 406, "YANIN FIRDAVS MAXAMADJONOVICH": 494};
 const ALL_DATES = [...new Set(RAW_DOCS.map(d=>d.dkey))].filter(k=>k!=='noma-lum').sort();
 const TODAY_KEY = ALL_DATES[ALL_DATES.length-1];
 const totalsAllTime = aggregateByPicker(RAW_DOCS).sort((a,b)=>b.positions-a.positions);
@@ -1051,7 +1051,7 @@ function renderOverview(){
     type:'line',
     data:{ labels: dayAxisLabels(byDay),
       datasets:[
-        { label:'Chiqim pozitsiya', data: byDay.map(d=>d.chiqim_pos), borderColor: GOLD, backgroundColor:'rgba(212,175,55,0.12)', fill:true, tension:0.35, pointRadius:2, pointBackgroundColor:GOLD },
+        { label:'Çiqim pozitsiya', data: byDay.map(d=>d.chiqim_pos), borderColor: GOLD, backgroundColor:'rgba(212,175,55,0.12)', fill:true, tension:0.35, pointRadius:2, pointBackgroundColor:GOLD },
         { label:"Tovar ötkaziş pozitsiya", data: byDay.map(d=>d.otk_pos), borderColor: BLUE, backgroundColor:'rgba(111,168,220,0.10)', fill:true, tension:0.35, pointRadius:2, pointBackgroundColor:BLUE, borderWidth:2 }
       ]},
     options:{ responsive:true, maintainAspectRatio:false,
@@ -1133,8 +1133,8 @@ function renderPickers(){
         <span class="badge badge-gold">${fmtNum(m.positions)} ta pozitsiya</span>
       </div>
       <div class="mgr-stats">
-        <div><div class="mgr-stat-label">Chiqim hujjatlari</div><div class="mgr-stat-value">${fmtNum(m.chiqim_docs)} ta</div></div>
-        <div><div class="mgr-stat-label">Chiqim pozitsiya</div><div class="mgr-stat-value" style="color:var(--gold)">${fmtNum(m.chiqim_pos)} ta</div></div>
+        <div><div class="mgr-stat-label">Çiqim hujjatlari</div><div class="mgr-stat-value">${fmtNum(m.chiqim_docs)} ta</div></div>
+        <div><div class="mgr-stat-label">Çiqim pozitsiya</div><div class="mgr-stat-value" style="color:var(--gold)">${fmtNum(m.chiqim_pos)} ta</div></div>
         <div><div class="mgr-stat-label">Tovar ötk. hujjatlari</div><div class="mgr-stat-value">${fmtNum(m.otk_docs)} ta</div></div>
         <div><div class="mgr-stat-label">Tovar ötk. pozitsiya</div><div class="mgr-stat-value" style="color:var(--blue)">${fmtNum(m.otk_pos)} ta</div></div>
         <div><div class="mgr-stat-label">Jami pozitsiya</div><div class="mgr-stat-value">${fmtNum(m.positions)} ta</div></div>
