@@ -685,7 +685,7 @@
     Manba: <b>Odoo API — sale.order + pos.order</b><br>
     Savdo nuqtasi: <b>Hasanboy filial POS_1</b><br>
     Davr: <b>Noyabr 2026</b><br>
-    Oxirgi yangilaniş: <b>03.11.2026 19:00</b>
+    Oxirgi yangilaniş: <b>03.11.2026 19:15</b>
   </div>
   <button type="button" id="sbToggle" class="sb-toggle" aria-label="Yon panelni yiğiş / yoyiş" title="Yiğiş / yoyiş  ( [ )">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>
@@ -1983,9 +1983,13 @@ function renderManagers(){
       <div class="mg-bar"><span>Tölov</span><div class="trk ov90"><div class="fill" style="width:${Math.min(payRatio,100).toFixed(1)}%;background:${ppc}"></div><i></i></div><b style="color:${ppc}">${fmtPct(payRatio)}</b></div>
       <div class="mg-stats">
         <div><div class="lbl">Buyurtma</div><b>${fmtNum(m.orders)}</b></div>
-        <div><div class="lbl">Örtaça çek</div><b>${fmtSumShort(m.orders? m.total/m.orders : 0)}</b></div>
-        <div><div class="lbl" title="Tölov 90% ga yetişi uçun kerak">90% gaça</div><b style="color:${payEligible?'var(--green)':'var(--amber)'}">${payEligible ? 'Yetarli' : fmtSumShort(amountNeeded)}</b></div>
-        <div><div class="lbl">Qarz</div><b style="color:var(--red)">${fmtSumShort(m.unpaid)}</b></div>
+        <div><div class="lbl">Örtaça çek</div><b>${fmtNum(Math.round(m.orders? m.total/m.orders : 0))}</b></div>
+        <div><div class="lbl" title="Tölov 90% ga yetişi uçun kerak">90% gaça</div><b style="color:${payEligible?'var(--green)':'var(--amber)'}">${payEligible ? 'Yetarli' : fmtNum(Math.round(amountNeeded))}</b></div>
+      </div>
+      <div class="mg-stats" style="margin-top:var(--sp-3);padding-top:var(--sp-3)">
+        <div><div class="lbl">Sotilgan (söm)</div><b>${fmtNum(m.total,0)}</b></div>
+        <div><div class="lbl">Pul kirimi (söm)</div><b style="color:var(--green)">${fmtNum(m.paid,0)}</b></div>
+        <div><div class="lbl">Qarz (söm)</div><b style="color:var(--red)">${fmtNum(m.unpaid,0)}</b></div>
       </div>
       <div class="mg-bonus">
         <div><div class="lbl">Savdo bonusi</div><b>${fmtSum(bonusSale)}</b></div>
