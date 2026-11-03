@@ -594,10 +594,10 @@
     </button>
   </nav>
   <div class="sidebar-foot">
-    Manba: <b>Odoo API — stock.picking (chiqim, tovar o'tkazish)</b><br>
+    Manba: <b>Odoo API — stock.picking (çiqim, tovar ötkaziş)</b><br>
     Hisoblaş birligi: <b>Операции/Товар (pozitsiya)</b><br>
     Davr: <b id="sidebarDavr">Avgust 2026</b><br>
-    Oxirgi yangilanish: <b>03.11.2026 11:15</b><br>
+    Oxirgi yangilaniş: <b>03.11.2026 11:30</b><br>
     Bonus: <b>500 söm / pozitsiya</b>
   </div>
   <button type="button" id="sbToggle" class="sb-toggle" aria-label="Yon panelni yiğiş / yoyiş" title="Yiğiş / yoyiş  ( [ )">
@@ -798,7 +798,7 @@ const PICKERS = [...new Set(RAW_DOCS.map(d=>d.picker))].sort();
 
 const MONTHS_UZ = ['yan','fev','mar','apr','may','iyun','iyul','avg','sen','okt','noy','dek'];
 const MONTHS_UZ_FULL = ['Yanvar','Fevral','Mart','Aprel','May','Iyun','Iyul','Avgust','Sentabr','Oktabr','Noyabr','Dekabr'];
-const DOW_UZ = ['Yak','Dush','Sesh','Chor','Pay','Jum','Shan'];
+const DOW_UZ = ['Yak','Duş','Seş','Çor','Pay','Jum','Şan'];
 
 function fmtNum(n, dec=0){
   if(n===null||n===undefined||isNaN(n)) return '\u2014';
@@ -821,7 +821,7 @@ function fmtDate(dt){
   return String(dt.getDate()).padStart(2,'0')+' '+MONTHS_UZ[dt.getMonth()]+' '+dt.getFullYear();
 }
 function dayAxisLabels(byDay){
-  // 2026-10-21: grafik pastida sanalar oddiy kun raqami (1, 2, 3...) ko'rinadi; bir necha oy bo'lsa oy boshi "1 noy" kabi.
+  // 2026-10-21: grafik pastida sanalar oddiy kun raqami (1, 2, 3...) körinadi; bir necha oy bo'lsa oy boshi "1 noy" kabi.
   const multi = new Set(byDay.map(d=>d.date? d.date.getFullYear()*12+d.date.getMonth() : 0)).size > 1;
   return byDay.map((d,i)=>{ if(!d.date) return ''; const n=d.date.getDate(); return (multi && (i===0||n===1)) ? n+' '+MONTHS_UZ[d.date.getMonth()] : String(n); });
 }
@@ -1328,7 +1328,7 @@ applyMonth(CURRENT_Y, CURRENT_M);
     var sw=document.getElementById('monthSwitch'), lab=document.getElementById('monthLabel');
     if(!sw || !lab || typeof filters==='undefined' || typeof applyMonth!=='function') return;
     var MS=['Yan','Fev','Mar','Apr','May','Iyn','Iyl','Avg','Sen','Okt','Noy','Dek'];
-    var DOW=['Du','Se','Ch','Pa','Ju','Sh','Ya'];
+    var DOW=['Du','Se','Ç','Pa','Ju','Ş','Ya'];
     var p2=function(n){ return String(n).padStart(2,'0'); };
     var key=function(y,m,d){ return y+'-'+p2(m+1)+'-'+p2(d); };
     var todayKey=function(){ var t=new Date(); return key(t.getFullYear(),t.getMonth(),t.getDate()); };
