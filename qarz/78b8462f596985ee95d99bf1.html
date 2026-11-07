@@ -1,0 +1,61 @@
+<!doctype html><html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Qarzdorlik hisoboti</title>
+<style>
+:root{--bg:#f4f6fa;--card:#fff;--tx:#162033;--mu:#6b778c;--ln:#e3e8f0;--ac:#2563eb;--rd:#dc2626;--gn:#16a34a;--am:#d97706}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1521;--card:#18202f;--tx:#e8edf6;--mu:#93a0b6;--ln:#273146;--ac:#60a5fa;--rd:#f87171;--gn:#4ade80;--am:#fbbf24}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.w{max-width:860px;margin:0 auto;padding:0 16px 40px}
+header{padding:18px 0 8px}.br{font-weight:700;letter-spacing:.3px;color:var(--ac)}h1{margin:2px 0 2px;font-size:22px}.sub{color:var(--mu);font-size:13px}
+.tag{display:inline-block;background:#fef3c7;color:#92400e;border-radius:6px;padding:2px 8px;font-size:12px;font-weight:600;margin-left:6px}
+.kp{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.k{background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:10px 12px}
+.k b{display:block;font-size:16px;white-space:nowrap}.k span{color:var(--mu);font-size:12px}
+.bar{position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:5;display:flex;gap:8px;flex-wrap:wrap}
+input[type=search]{flex:1 1 200px;min-width:0;padding:11px 12px;border:1px solid var(--ln);border-radius:10px;background:var(--card);color:var(--tx);font-size:16px}
+.ch{padding:10px 14px;border:1px solid var(--ln);border-radius:10px;background:var(--card);color:var(--tx);font-size:14px;cursor:pointer;min-height:44px}
+.ch.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.L{margin:18px 0 6px;font-weight:700;color:var(--ac);font-size:13px;letter-spacing:1px}
+.cl{background:var(--card);border:1px solid var(--ln);border-radius:14px;margin-bottom:10px;overflow:clip}
+.ch2{position:sticky;top:0;z-index:5;background:var(--card);cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;display:flex;justify-content:space-between;gap:8px;align-items:baseline;padding:11px 14px;border-bottom:1px solid var(--ln)}
+.ch2 b{font-size:16px}.ar{display:inline-block;width:18px;color:var(--mu);transition:transform .15s}.cl.op .ar{transform:rotate(90deg)}.cl:not(.op) .r,.cl:not(.op) .cb{display:none}.cb{padding:13px;text-align:center;font-weight:600;color:var(--ac);cursor:pointer;border-top:1px solid var(--ln);background:var(--card)}.cl:not(.op) .ch2{border-bottom:0}.cn{white-space:nowrap;color:var(--mu);font-weight:400;font-size:12px;margin-left:6px}.tt{color:var(--rd);font-weight:700;white-space:nowrap}
+.r{display:grid;grid-template-columns:1fr auto;gap:8px;padding:9px 14px;border-bottom:1px solid var(--ln);align-items:center}.r:last-child{border:0}
+.dt{font-variant-numeric:tabular-nums;font-weight:600;font-size:14px}.nm{font-size:12px;color:var(--mu);margin-top:2px}
+.q{white-space:nowrap;text-align:right;font-weight:600;font-variant-numeric:tabular-nums}.q small{display:block;color:var(--mu);font-weight:400;font-size:11px}
+.z{color:var(--gn)}.o{color:var(--rd)}.p{color:var(--am)}
+.bd{white-space:nowrap;font-size:11px;padding:1px 6px;border-radius:5px;background:var(--ln);margin-left:4px}
+.em{text-align:center;color:var(--mu);padding:30px}
+@media print{.bar,.cb{display:none}.ch2{position:static}.cl .r{display:grid!important}body{background:#fff}}
+</style></head><body><div class="w">
+<header><div class="br">dunyabunya</div><h1>Qarzdorlik hisoboti</h1><div class="sub" id="sub"></div></header>
+<div class="kp"><div class="k"><b id="k1"></b><span>Jami qarz</span></div><div class="k"><b id="k2"></b><span>Yopilmagan cheklar</span></div><div class="k"><b id="k3"></b><span>Muddati o‘tgan (3 kundan ko‘p)</span></div></div>
+<div class="bar"><input type="search" id="s" placeholder="Mijoz yoki hujjat raqami..."><button class="ch on" id="f1">Faqat yopilmaganlar</button><button class="ch" id="ta">Hammasini ochish</button></div>
+<div id="out"></div></div>
+<script>
+const DATA=[{"c":"4144 AKBAR AKA","d":"2026-11-04","n":"S106603","s":2428400.0,"q":2400.0},{"c":"ALISHER AKA UMAR AKA ORTOQ","d":"2026-09-25","n":"S65883","s":5916550.0,"q":3531550.0},{"c":"BAHROM AKA SNABJENA 0030","d":"2026-09-17","n":"S82298","s":670000.0,"q":180000.0},{"c":"BAHTIYOR AKA 4777","d":"2026-10-28","n":"S103110","s":4000000.0,"q":270000.0},{"c":"BAHTIYOR AKA 4777","d":"2026-11-05","n":"S106734","s":7800000.0,"q":7800000.0},{"c":"BAHTIYOR AKA 4777","d":"2026-11-05","n":"S107082","s":26392000.0,"q":26392000.0},{"c":"BEGZOD 9999 (UMAR ORTOGI)","d":"2026-10-31","n":"S104637","s":15999000.0,"q":15999000.0},{"c":"BOTIR AKA ARENDA E BLOK 0779","d":"2026-10-15","n":"S96327","s":110000.0,"q":110000.0},{"c":"JAMSHID AKA NAXT 2225","d":"2026-11-06","n":"S107321","s":5040000.0,"q":5040000.0},{"c":"JAMSHID AKA NAXT 2225","d":"2026-11-06","n":"S107614","s":823000.0,"q":823000.0},{"c":"KOMOL AKA VULKANIZATSA","d":"2026-10-02","n":"S89550","s":3355000.0,"q":3355000.0},{"c":"RAMZ 2222","d":"2026-10-28","n":"S102885","s":1760000.0,"q":1760000.0},{"c":"SAFAR 6688","d":"2026-11-06","n":"S107640","s":456000.0,"q":456000.0},{"c":"SAIDAHMAD AKA    SHIRIBOM  ARENDA","d":"2026-08-03","n":"S61400","s":1068000.0,"q":1068000.0},{"c":"SAIDAHMAD AKA    SHIRIBOM  ARENDA","d":"2026-08-04","n":"S61889","s":26000.0,"q":26000.0},{"c":"SAIDAHMAD AKA    SHIRIBOM  ARENDA","d":"2026-08-04","n":"S62184","s":1920000.0,"q":1920000.0},{"c":"SAIDAHMAD AKA    SHIRIBOM  ARENDA","d":"2026-08-07","n":"S63430","s":995000.0,"q":995000.0},{"c":"SAIDAHMAD AKA    SHIRIBOM  ARENDA","d":"2026-08-09","n":"S64324","s":77000.0,"q":77000.0},{"c":"SAIDAHMAD AKA    SHIRIBOM  ARENDA","d":"2026-08-11","n":"S65315","s":303000.0,"q":303000.0},{"c":"SAIDAHMAD AKA    SHIRIBOM  ARENDA","d":"2026-08-17","n":"S67895","s":405000.0,"q":405000.0},{"c":"SAIDAHMAD AKA    SHIRIBOM  ARENDA","d":"2026-08-26","n":"S71806","s":1725000.0,"q":1725000.0},{"c":"SAIDAHMAD AKA    SHIRIBOM  ARENDA","d":"2026-08-27","n":"S72332","s":70000.0,"q":70000.0},{"c":"SAIDAHMAD AKA    SHIRIBOM  ARENDA","d":"2026-08-28","n":"S73007","s":708000.0,"q":708000.0},{"c":"SAIDAHMAD AKA    SHIRIBOM  ARENDA","d":"2026-08-29","n":"S73528","s":3505000.0,"q":3505000.0},{"c":"SAIDAHMAD AKA    SHIRIBOM  ARENDA","d":"2026-10-08","n":"S92392","s":700000.0,"q":65432.06},{"c":"SAIDAHMAD AKA    SHIRIBOM  ARENDA","d":"2026-10-11","n":"S93872","s":350000.0,"q":350000.0},{"c":"SAIDAHMAD AKA    SHIRIBOM  ARENDA","d":"2026-10-13","n":"S94865","s":28000.0,"q":28000.0},{"c":"SAIDAHMAD AKA    SHIRIBOM  ARENDA","d":"2026-10-13","n":"S95132","s":720000.0,"q":720000.0},{"c":"SAIDAHMAD AKA    SHIRIBOM  ARENDA","d":"2026-10-19","n":"S98168","s":734000.0,"q":734000.0},{"c":"SAIDAHMAD AKA    SHIRIBOM  ARENDA","d":"2026-10-22","n":"S100138","s":137000.0,"q":137000.0},{"c":"SAIDAHMAD AKA    SHIRIBOM  ARENDA","d":"2026-10-23","n":"S100426","s":420864.0,"q":420864.0},{"c":"SAIDAHMAD AKA    SHIRIBOM  ARENDA","d":"2026-10-25","n":"S101355","s":319000.0,"q":319000.0},{"c":"SAIDAHMAD AKA    SHIRIBOM  ARENDA","d":"2026-10-26","n":"S102085","s":350000.0,"q":350000.0},{"c":"SAIDAHMAD AKA    SHIRIBOM  ARENDA","d":"2026-10-27","n":"S102622","s":210000.0,"q":210000.0},{"c":"SAIDAHMAD AKA    SHIRIBOM  ARENDA","d":"2026-10-30","n":"S103910","s":106000.0,"q":106000.0},{"c":"SAIDAHMAD AKA    SHIRIBOM  ARENDA","d":"2026-10-31","n":"S104378","s":100000.0,"q":100000.0},{"c":"SAIDAHMAD AKA    SHIRIBOM  ARENDA","d":"2026-11-01","n":"S104756","s":71000.0,"q":71000.0},{"c":"SAMANDAR 9777","d":"2026-10-17","n":"S97071","s":1555000.0,"q":1555000.0},{"c":"SHIRIBOM CHAKANA","d":"2026-09-27","n":"S87378","s":61683.0,"q":61683.0},{"c":"SUNNAT AKA 7327 {UMARAKA O'RTOG'I}","d":"2026-11-01","n":"S104966","s":9420000.0,"q":9420000.0},{"c":"TEMUR  4774","d":"2026-11-04","n":"S106307","s":1750000.0,"q":1750000.0},{"c":"XOMUT AKA (SALOH AKA)","d":"2026-10-18","n":"S97400","s":1680000.0,"q":1680000.0},{"c":"XOMUT AKA (SALOH AKA)","d":"2026-10-27","n":"S102633","s":270320.0,"q":270320.0}];const TODAY=new Date("2026-11-07");
+const fm=n=>Math.round(n).toLocaleString("ru-RU").replace(/ /g," ");
+const fd=s=>s.slice(8)+"."+s.slice(5,7)+"."+s.slice(0,4);
+const days=s=>Math.floor((TODAY-new Date(s))/864e5);
+let onlyOpen=true,onlyOver=false;const OPEN=new Set();
+document.getElementById("sub").textContent="Asadullayev Abduvali · Shiribom Chakana · holat: 07.11.2026 16:18";
+function draw(){
+ const t=document.getElementById("s").value.trim().toLowerCase();
+ let rows=DATA.filter(r=>(!onlyOpen||r.q>0)&&(!onlyOver||(r.q>0&&days(r.d)>3))&&(!t||(r.c+" "+r.n).toLowerCase().includes(t)));
+ document.getElementById("k1").textContent=fm(rows.reduce((a,r)=>a+r.q,0));
+ document.getElementById("k2").textContent=rows.filter(r=>r.q>0).length+" ta";
+ document.getElementById("k3").textContent=rows.filter(r=>r.q>0&&days(r.d)>3).length+" ta";
+ const g={};rows.forEach(r=>(g[r.c]=g[r.c]||[]).push(r));
+ const sm=c=>g[c].reduce((x,r)=>x+r.q,0);const names=Object.keys(g).sort((a,b)=>sm(b)-sm(a)||a.localeCompare(b,"uz"));
+ let h="",L="";
+ names.forEach(c=>{
+  const it=g[c].sort((a,b)=>a.d.localeCompare(b.d));const tot=it.reduce((a,r)=>a+r.q,0);
+  const op=OPEN.has(c)||(t&&true);h+=`<div class="cl${op?" op":""}" data-c="${c.replace(/"/g,"&quot;")}"><div class="ch2"><b><span class="ar">▸</span>${c}<span class="cn">${it.length} ta</span></b><span class="tt">${fm(tot)}</span></div>`+it.map(r=>{
+   const dd=days(r.d),cls=r.q==0?"z":dd>3?"o":"p";
+   return `<div class="r"><div><div class="dt">${fd(r.d)}</div><div class="nm">${r.n}${dd>3&&r.q>0?`<span class="bd">${dd} kun</span>`:""}</div></div><div class="q ${cls}">${r.q==0?"yopilgan":fm(r.q)}<small>chek: ${fm(r.s)}</small></div></div>`}).join("")+`</div>`});
+ document.getElementById("out").innerHTML=h||'<div class="em">Hec narsa topilmadi</div>';
+}
+document.getElementById("s").oninput=draw;
+document.getElementById("out").addEventListener("click",e=>{const h=e.target.closest(".ch2");if(!h)return;const cl=h.parentNode,c=cl.dataset.c;if(cl.classList.contains("op")){cl.classList.remove("op");OPEN.delete(c)}else{document.querySelectorAll(".cl.op").forEach(x=>{x.classList.remove("op");OPEN.delete(x.dataset.c)});cl.classList.add("op");OPEN.add(c);window.scrollTo(0,cl.getBoundingClientRect().top+window.scrollY-6)}});
+const ta=document.getElementById("ta");if(ta)ta.onclick=()=>{const all=document.querySelectorAll(".cl");const open=[...all].every(x=>x.classList.contains("op"));all.forEach(x=>{x.classList.toggle("op",!open);open?OPEN.delete(x.dataset.c):OPEN.add(x.dataset.c)});ta.textContent=open?"Hammasini ochish":"Hammasini yopish"};
+f1.onclick=()=>{onlyOpen=!onlyOpen;f1.classList.toggle("on",onlyOpen);draw()};
+
+draw();
+</script></body></html>
