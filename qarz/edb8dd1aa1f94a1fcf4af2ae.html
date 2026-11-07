@@ -9,7 +9,7 @@ header{padding:18px 0 8px}.br{font-weight:700;letter-spacing:.3px;color:var(--ac
 .tag{display:inline-block;background:#fef3c7;color:#92400e;border-radius:6px;padding:2px 8px;font-size:12px;font-weight:600;margin-left:6px}
 .kp{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.k{background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:10px 12px}
 .k b{display:block;font-size:16px;white-space:nowrap}.k span{color:var(--mu);font-size:12px}
-.bar{position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:5;display:flex;gap:8px;flex-wrap:wrap}
+.bar{background:var(--bg);padding:8px 0;display:flex;gap:8px;flex-wrap:wrap}
 input[type=search]{flex:1 1 200px;min-width:0;padding:11px 12px;border:1px solid var(--ln);border-radius:10px;background:var(--card);color:var(--tx);font-size:16px}
 .ch{padding:10px 14px;border:1px solid var(--ln);border-radius:10px;background:var(--card);color:var(--tx);font-size:14px;cursor:pointer;min-height:44px}
 .ch.on{background:var(--ac);color:#fff;border-color:var(--ac)}
@@ -27,7 +27,7 @@ input[type=search]{flex:1 1 200px;min-width:0;padding:11px 12px;border:1px solid
 </style></head><body><div class="w">
 <header><div class="br">dunyabunya</div><h1>Qarzdorlik hisoboti</h1><div class="sub" id="sub"></div></header>
 <div class="kp"><div class="k"><b id="k1"></b><span>Jami qarz</span></div><div class="k"><b id="k2"></b><span>Yopilmagan cheklar</span></div><div class="k"><b id="k3"></b><span>Muddati o‘tgan (3 kundan ko‘p)</span></div></div>
-<div class="bar"><input type="search" id="s" placeholder="Mijoz yoki hujjat raqami..."><button class="ch on" id="f1">Faqat yopilmaganlar</button><button class="ch" id="ta">Hammasini ochish</button></div>
+<div class="bar"><input type="search" id="s" placeholder="Mijoz yoki hujjat raqami..."><button class="ch" id="ta">Hammasini ochish</button></div>
 <div id="out"></div></div>
 <script>
 const DATA=[{"c":"SUNNAT MENEDJER 7777","d":"2026-08-06","n":"S62944","s":580000.0,"q":580000.0}];const TODAY=new Date("2026-11-07");
@@ -35,7 +35,7 @@ const fm=n=>Math.round(n).toLocaleString("ru-RU").replace(/ /g," ");
 const fd=s=>s.slice(8)+"."+s.slice(5,7)+"."+s.slice(0,4);
 const days=s=>Math.floor((TODAY-new Date(s))/864e5);
 let onlyOpen=true,onlyOver=false;const OPEN=new Set();
-document.getElementById("sub").textContent="Hojiakbarov Bahodirjon · Qorasaroy Chakana · holat: 07.11.2026 16:18";
+document.getElementById("sub").textContent="Hojiakbarov Bahodirjon · Qorasaroy Chakana · holat: 07.11.2026 17:00";
 function draw(){
  const t=document.getElementById("s").value.trim().toLowerCase();
  let rows=DATA.filter(r=>(!onlyOpen||r.q>0)&&(!onlyOver||(r.q>0&&days(r.d)>3))&&(!t||(r.c+" "+r.n).toLowerCase().includes(t)));
@@ -55,7 +55,7 @@ function draw(){
 document.getElementById("s").oninput=draw;
 document.getElementById("out").addEventListener("click",e=>{const h=e.target.closest(".ch2");if(!h)return;const cl=h.parentNode,c=cl.dataset.c;if(cl.classList.contains("op")){cl.classList.remove("op");OPEN.delete(c)}else{document.querySelectorAll(".cl.op").forEach(x=>{x.classList.remove("op");OPEN.delete(x.dataset.c)});cl.classList.add("op");OPEN.add(c);window.scrollTo(0,cl.getBoundingClientRect().top+window.scrollY-6)}});
 const ta=document.getElementById("ta");if(ta)ta.onclick=()=>{const all=document.querySelectorAll(".cl");const open=[...all].every(x=>x.classList.contains("op"));all.forEach(x=>{x.classList.toggle("op",!open);open?OPEN.delete(x.dataset.c):OPEN.add(x.dataset.c)});ta.textContent=open?"Hammasini ochish":"Hammasini yopish"};
-f1.onclick=()=>{onlyOpen=!onlyOpen;f1.classList.toggle("on",onlyOpen);draw()};
+
 
 draw();
 </script></body></html>
