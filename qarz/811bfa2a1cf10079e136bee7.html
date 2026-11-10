@@ -30,12 +30,12 @@ input[type=search]{flex:1 1 200px;min-width:0;padding:11px 12px;border:1px solid
 <div class="bar"><input type="search" id="s" placeholder="Mijoz yoki hujjat raqami..."><button class="ch" id="ta">Hammasini ochish</button></div>
 <div id="out"></div></div>
 <script>
-const DATA=[{"c":"Jaxongir Tarket oddel","d":"2026-11-07","n":"S107757","s":55000.0,"q":55000.0},{"c":"MUROD 0145","d":"2026-08-24","n":"S70613","s":36541667.2,"q":36541667.2},{"c":"MUZAFFAR AKA 1814 (USMON)","d":"2026-10-24","n":"S100846","s":1225926.0,"q":1225926.0},{"c":"RUSTAM AKA 0003","d":"2026-08-25","n":"S71743","s":900000.0,"q":900000.0},{"c":"SAIDAHMAD AKA    SHIRIBOM  ARENDA","d":"2026-08-03","n":"S61471","s":31000.0,"q":31000.0},{"c":"SIROJIDDIN AKA 3300","d":"2026-08-01","n":"S60381","s":17780000.0,"q":12517000.0},{"c":"SIROJIDDIN AKA 3300","d":"2026-08-09","n":"S63815","s":29887000.0,"q":29887000.0},{"c":"SIROJIDDIN AKA 3300","d":"2026-08-09","n":"S64148","s":7600000.0,"q":7600000.0},{"c":"SIROJIDDIN AKA 3300","d":"2026-08-09","n":"S64384","s":420000.0,"q":420000.0},{"c":"ZIYOMIDDIN 0072","d":"2026-09-10","n":"S78253","s":1378000.0,"q":1378000.0}];const TODAY=new Date("2026-11-10");
+const DATA=[{"c":"Jaxongir Tarket oddel","d":"2026-11-07","n":"S107757","s":55000.0,"q":55000.0},{"c":"MUZAFFAR AKA 1814 (USMON)","d":"2026-10-24","n":"S100846","s":1225926.0,"q":1225926.0}];const TODAY=new Date("2026-11-10");
 const fm=n=>Math.round(n).toLocaleString("ru-RU").replace(/ /g," ");
 const fd=s=>s.slice(8)+"."+s.slice(5,7)+"."+s.slice(0,4);
 const days=s=>Math.floor((TODAY-new Date(s))/864e5);
 let onlyOpen=true,onlyOver=false;const OPEN=new Set();
-document.getElementById("sub").textContent="Nabixo‘jayev Saidazim · Shiribom Chakana · holat: 10.11.2026 12:57";
+document.getElementById("sub").textContent="Nabixo‘jayev Saidazim · Shiribom Chakana · holat: 10.11.2026 18:12";
 function draw(){
  const t=document.getElementById("s").value.trim().toLowerCase();
  let rows=DATA.filter(r=>(!onlyOpen||r.q>0)&&(!onlyOver||(r.q>0&&days(r.d)>3))&&(!t||(r.c+" "+r.n).toLowerCase().includes(t)));
