@@ -30,12 +30,12 @@ input[type=search]{flex:1 1 200px;min-width:0;padding:11px 12px;border:1px solid
 <div class="bar"><input type="search" id="s" placeholder="Mijoz yoki hujjat raqami..."><button class="ch" id="ta">Hammasini ochish</button></div>
 <div id="out"></div></div>
 <script>
-const DATA=[{"c":"ABDUMUTAL AKA 3784","d":"2026-11-11","n":"S109744","s":998400.0,"q":1200.0},{"c":"DONIYOR BOSS","d":"2026-10-25","n":"S101601","s":190000.0,"q":190000.0},{"c":"ISHONCH NASIYA","d":"2026-10-13","n":"S94881","s":7410000.0,"q":7169979.36},{"c":"JAVLON AKA 5883","d":"2026-11-11","n":"S109813","s":319475.0,"q":475.0},{"c":"MUROD 8282","d":"2026-10-24","n":"S100868","s":951552.0,"q":111552.0},{"c":"ODIL SNABJENIYA","d":"2026-11-02","n":"S105453","s":478000.0,"q":478000.0},{"c":"RUSTAM AKA 0570","d":"2026-11-11","n":"S109576","s":42000.0,"q":42000.0},{"c":"SHOVKAT AKA 8480","d":"2026-10-22","n":"S100112","s":2730000.0,"q":2730000.0},{"c":"YUSUF AKA 1373","d":"2026-11-11","n":"S109845","s":5420000.0,"q":5420000.0}];const TODAY=new Date("2026-11-12");
+const DATA=[{"c":"ABDUMUTAL AKA 3784","d":"2026-11-11","n":"S109744","s":998400.0,"q":1200.0},{"c":"DONIYOR BOSS","d":"2026-10-25","n":"S101601","s":190000.0,"q":190000.0},{"c":"JAVLON AKA 5883","d":"2026-11-11","n":"S109813","s":319475.0,"q":475.0},{"c":"MUROD 8282","d":"2026-10-24","n":"S100868","s":951552.0,"q":111552.0},{"c":"ODIL SNABJENIYA","d":"2026-11-02","n":"S105453","s":478000.0,"q":478000.0},{"c":"RUSTAM AKA 0570","d":"2026-11-11","n":"S109576","s":42000.0,"q":42000.0},{"c":"YUSUF AKA 1373","d":"2026-11-11","n":"S109845","s":5420000.0,"q":5420000.0}];const TODAY=new Date("2026-11-12");
 const fm=n=>Math.round(n).toLocaleString("ru-RU").replace(/ /g," ");
 const fd=s=>s.slice(8)+"."+s.slice(5,7)+"."+s.slice(0,4);
 const days=s=>Math.floor((TODAY-new Date(s))/864e5);
 let onlyOpen=true,onlyOver=false;const OPEN=new Set();
-document.getElementById("sub").textContent="Payziyeva Nilufar · Shiribom Chakana · holat: 12.11.2026 00:36";
+document.getElementById("sub").textContent="Payziyeva Nilufar · Shiribom Chakana · holat: 12.11.2026 01:18";
 function draw(){
  const t=document.getElementById("s").value.trim().toLowerCase();
  let rows=DATA.filter(r=>(!onlyOpen||r.q>0)&&(!onlyOver||(r.q>0&&days(r.d)>3))&&(!t||(r.c+" "+r.n).toLowerCase().includes(t)));
