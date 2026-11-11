@@ -30,12 +30,12 @@ input[type=search]{flex:1 1 200px;min-width:0;padding:11px 12px;border:1px solid
 <div class="bar"><input type="search" id="s" placeholder="Mijoz yoki hujjat raqami..."><button class="ch" id="ta">Hammasini ochish</button></div>
 <div id="out"></div></div>
 <script>
-const DATA=[{"c":"SAIDAZIM AKA  (BEZ OCHERED)","d":"2026-10-25","n":"S101664","s":88960.52,"q":88960.52},{"c":"SAIDAZIM AKA  (BEZ OCHERED)","d":"2026-10-29","n":"S103237","s":1078500.0,"q":1078500.0},{"c":"SAIDAZIM AKA  (BEZ OCHERED)","d":"2026-10-29","n":"S103639","s":918000.0,"q":918000.0},{"c":"TURDIALI 80 80 ABDUVOXID OKA","d":"2026-10-28","n":"S103109","s":4270000.0,"q":4270000.0},{"c":"XOMUT AKA (SALOH AKA)","d":"2026-10-30","n":"S104083","s":2002000.0,"q":2002000.0}];const TODAY=new Date("2026-11-07");
+const DATA=[{"c":"AZIZ AKA 5551","d":"2026-10-21","n":"S99404","s":1200000.0,"q":1200000.0},{"c":"SAIDAZIM AKA  (BEZ OCHERED)","d":"2026-10-25","n":"S101664","s":88960.52,"q":88960.52},{"c":"SAIDAZIM AKA  (BEZ OCHERED)","d":"2026-10-29","n":"S103237","s":1078500.0,"q":1078500.0},{"c":"SAIDAZIM AKA  (BEZ OCHERED)","d":"2026-10-29","n":"S103639","s":918000.0,"q":918000.0},{"c":"TEMUR AKA 0770","d":"2026-10-21","n":"S99569","s":220000.0,"q":45000.0},{"c":"TURDIALI 80 80 ABDUVOXID OKA","d":"2026-10-28","n":"S103109","s":4270000.0,"q":4270000.0},{"c":"XOMUT AKA (SALOH AKA)","d":"2026-10-30","n":"S104083","s":2002000.0,"q":2002000.0}];const TODAY=new Date("2026-11-12");
 const fm=n=>Math.round(n).toLocaleString("ru-RU").replace(/ /g," ");
 const fd=s=>s.slice(8)+"."+s.slice(5,7)+"."+s.slice(0,4);
 const days=s=>Math.floor((TODAY-new Date(s))/864e5);
 let onlyOpen=true,onlyOver=false;const OPEN=new Set();
-document.getElementById("sub").textContent="Raximov Kamronbek · Qorasaroy Chakana · holat: 07.11.2026 17:00";
+document.getElementById("sub").textContent="Raximov Kamronbek · Qorasaroy Chakana · holat: 12.11.2026 00:36";
 function draw(){
  const t=document.getElementById("s").value.trim().toLowerCase();
  let rows=DATA.filter(r=>(!onlyOpen||r.q>0)&&(!onlyOver||(r.q>0&&days(r.d)>3))&&(!t||(r.c+" "+r.n).toLowerCase().includes(t)));
