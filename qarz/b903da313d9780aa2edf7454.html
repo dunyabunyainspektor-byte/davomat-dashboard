@@ -30,12 +30,12 @@ input[type=search]{flex:1 1 200px;min-width:0;padding:11px 12px;border:1px solid
 <div class="bar"><input type="search" id="s" placeholder="Mijoz yoki hujjat raqami..."><button class="ch" id="ta">Hammasini ochish</button></div>
 <div id="out"></div></div>
 <script>
-const DATA=[{"c":"RAMIL 7930","d":"2026-10-29","n":"S103143","s":200000.0,"q":200000.0},{"c":"SAIDAZIM AKA  (BEZ OCHERED)","d":"2026-11-03","n":"S105272","s":1146000.0,"q":1146000.0},{"c":"SAIDAZIM AKA  (BEZ OCHERED)","d":"2026-11-07","n":"S107970","s":376375.02,"q":376375.02},{"c":"SAIDAZIM AKA  (BEZ OCHERED)","d":"2026-11-08","n":"S108458","s":1110000.0,"q":1110000.0}];const TODAY=new Date("2026-11-09");
+const DATA=[{"c":"IBROHIM 2229","d":"2026-11-12","n":"S110326","s":198600.0,"q":198600.0},{"c":"RAMIL 7930","d":"2026-10-29","n":"S103143","s":200000.0,"q":200000.0},{"c":"SAIDAZIM AKA  (BEZ OCHERED)","d":"2026-11-03","n":"S105272","s":1146000.0,"q":1146000.0},{"c":"SAIDAZIM AKA  (BEZ OCHERED)","d":"2026-11-07","n":"S107970","s":376375.02,"q":376375.02},{"c":"SAIDAZIM AKA  (BEZ OCHERED)","d":"2026-11-08","n":"S108458","s":1110000.0,"q":1110000.0}];const TODAY=new Date("2026-11-13");
 const fm=n=>Math.round(n).toLocaleString("ru-RU").replace(/ /g," ");
 const fd=s=>s.slice(8)+"."+s.slice(5,7)+"."+s.slice(0,4);
 const days=s=>Math.floor((TODAY-new Date(s))/864e5);
 let onlyOpen=true,onlyOver=false;const OPEN=new Set();
-document.getElementById("sub").textContent="Shamsiyev Voxidjon · Qorasaroy Chakana · holat: 09.11.2026 09:04";
+document.getElementById("sub").textContent="Shamsiyev Voxidjon · Qorasaroy Chakana · holat: 13.11.2026 00:03";
 function draw(){
  const t=document.getElementById("s").value.trim().toLowerCase();
  let rows=DATA.filter(r=>(!onlyOpen||r.q>0)&&(!onlyOver||(r.q>0&&days(r.d)>3))&&(!t||(r.c+" "+r.n).toLowerCase().includes(t)));
