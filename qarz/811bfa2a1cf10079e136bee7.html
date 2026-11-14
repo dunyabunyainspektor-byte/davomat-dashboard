@@ -30,12 +30,12 @@ input[type=search]{flex:1 1 200px;min-width:0;padding:11px 12px;border:1px solid
 <div class="bar"><input type="search" id="s" placeholder="Mijoz yoki hujjat raqami..."><button class="ch" id="ta">Hammasini ochish</button></div>
 <div id="out"></div></div>
 <script>
-const DATA=[{"c":"AKMAL AKA 7717","d":"2026-11-10","n":"S109009","s":150000.0,"q":150000.0},{"c":"ATHAM AKA 6463","d":"2026-11-10","n":"S109320","s":1320000.0,"q":1320000.0},{"c":"Jaxongir Tarket oddel","d":"2026-11-07","n":"S107757","s":55000.0,"q":55000.0},{"c":"MUZAFFAR AKA 1814 (USMON)","d":"2026-10-24","n":"S100846","s":1225926.0,"q":1225926.0},{"c":"SHIRIBOM CHAKANA","d":"2026-11-12","n":"S110338","s":17000.0,"q":1000.0}];const TODAY=new Date("2026-11-13");
+const DATA=[{"c":"AKMAL AKA 7717","d":"2026-11-10","n":"S109009","s":150000.0,"q":150000.0},{"c":"ATHAM AKA 6463","d":"2026-11-10","n":"S109320","s":1320000.0,"q":1320000.0},{"c":"Jaxongir Tarket oddel","d":"2026-11-07","n":"S107757","s":55000.0,"q":55000.0},{"c":"MUZAFFAR AKA 1814 (USMON)","d":"2026-10-24","n":"S100846","s":1225926.0,"q":1225926.0}];const TODAY=new Date("2026-11-14");
 const fm=n=>Math.round(n).toLocaleString("ru-RU").replace(/ /g," ");
 const fd=s=>s.slice(8)+"."+s.slice(5,7)+"."+s.slice(0,4);
 const days=s=>Math.floor((TODAY-new Date(s))/864e5);
 let onlyOpen=true,onlyOver=false;const OPEN=new Set();
-document.getElementById("sub").textContent="Nabixo‘jayev Saidazim · Shiribom Chakana · holat: 13.11.2026 00:03";
+document.getElementById("sub").textContent="Nabixo‘jayev Saidazim · Shiribom Chakana · holat: 14.11.2026 10:39";
 function draw(){
  const t=document.getElementById("s").value.trim().toLowerCase();
  let rows=DATA.filter(r=>(!onlyOpen||r.q>0)&&(!onlyOver||(r.q>0&&days(r.d)>3))&&(!t||(r.c+" "+r.n).toLowerCase().includes(t)));
