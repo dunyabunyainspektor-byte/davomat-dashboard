@@ -30,12 +30,12 @@ input[type=search]{flex:1 1 200px;min-width:0;padding:11px 12px;border:1px solid
 <div class="bar"><input type="search" id="s" placeholder="Mijoz yoki hujjat raqami..."><button class="ch" id="ta">Hammasini ochish</button></div>
 <div id="out"></div></div>
 <script>
-const DATA=[{"c":"DONIYOR BOSS","d":"2026-10-25","n":"S101601","s":190000.0,"q":190000.0},{"c":"MUROD 8282","d":"2026-10-24","n":"S100868","s":951552.0,"q":111552.0},{"c":"Maxfuza opa 6880","d":"2026-11-19","n":"S113511","s":185000.0,"q":185000.0},{"c":"UMIDA OPA  BAR   0059","d":"2026-11-16","n":"S112009","s":266000.0,"q":266000.0}];const TODAY=new Date("2026-11-20");
+const DATA=[{"c":"ALISHER AKA POVAR","d":"2026-11-20","n":"S113988","s":160000.0,"q":160000.0},{"c":"ASROR AKA 1313","d":"2026-11-20","n":"S113728","s":1595000.0,"q":1595000.0},{"c":"Abdukarim aka 0880","d":"2026-11-20","n":"S113670","s":420000.0,"q":50000.0},{"c":"DONIYOR BOSS","d":"2026-10-25","n":"S101601","s":190000.0,"q":190000.0},{"c":"JAMSHID AKA 6226","d":"2026-11-20","n":"S113797","s":347000.0,"q":347000.0},{"c":"MUROD 8282","d":"2026-10-24","n":"S100868","s":951552.0,"q":111552.0},{"c":"Maxfuza opa 6880","d":"2026-11-19","n":"S113511","s":185000.0,"q":185000.0},{"c":"UMIDA OPA  BAR   0059","d":"2026-11-16","n":"S112009","s":266000.0,"q":266000.0}];const TODAY=new Date("2026-11-21");
 const fm=n=>Math.round(n).toLocaleString("ru-RU").replace(/ /g," ");
 const fd=s=>s.slice(8)+"."+s.slice(5,7)+"."+s.slice(0,4);
 const days=s=>Math.floor((TODAY-new Date(s))/864e5);
 let onlyOpen=true,onlyOver=false;const OPEN=new Set();
-document.getElementById("sub").textContent="Payziyeva Nilufar · Shiribom Chakana · holat: 20.11.2026 18:45";
+document.getElementById("sub").textContent="Payziyeva Nilufar · Shiribom Chakana · holat: 21.11.2026 00:00";
 function draw(){
  const t=document.getElementById("s").value.trim().toLowerCase();
  let rows=DATA.filter(r=>(!onlyOpen||r.q>0)&&(!onlyOver||(r.q>0&&days(r.d)>3))&&(!t||(r.c+" "+r.n).toLowerCase().includes(t)));
