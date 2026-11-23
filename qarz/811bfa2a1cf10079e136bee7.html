@@ -30,12 +30,12 @@ input[type=search]{flex:1 1 200px;min-width:0;padding:11px 12px;border:1px solid
 <div class="bar"><input type="search" id="s" placeholder="Mijoz yoki hujjat raqami..."><button class="ch" id="ta">Hammasini ochish</button></div>
 <div id="out"></div></div>
 <script>
-const DATA=[{"c":"ABDULLOH AKA 0717","d":"2026-11-16","n":"S112027","s":1970000.0,"q":1970000.0},{"c":"DAVRON 1510","d":"2026-11-22","n":"S115008","s":254000.0,"q":1000.0},{"c":"ISHONCH NASIYA","d":"2026-11-14","n":"S111073","s":3283000.0,"q":3283000.0},{"c":"MUZAFFAR AKA 1814 (USMON)","d":"2026-10-24","n":"S100846","s":1225926.0,"q":1225926.0},{"c":"NURILLO AKA 1351","d":"2026-11-22","n":"S114968","s":1840000.0,"q":1840000.0},{"c":"SAID (DIAS) (FAXRIYOR)","d":"2026-11-16","n":"S112208","s":218000.0,"q":218000.0},{"c":"SAIDAZIM 3220","d":"2026-11-19","n":"S113624","s":320000.0,"q":320000.0},{"c":"SARDOR 8595","d":"2026-11-21","n":"S114531","s":214000.0,"q":48000.0},{"c":"SUXROB 9214","d":"2026-11-19","n":"S113442","s":3820500.0,"q":3820500.0}];const TODAY=new Date("2026-11-23");
+const DATA=[{"c":"ABDULLOH AKA 0717","d":"2026-11-16","n":"S112027","s":1970000.0,"q":1970000.0},{"c":"DAVRON 1510","d":"2026-11-22","n":"S115008","s":254000.0,"q":1000.0},{"c":"ISHONCH NASIYA","d":"2026-11-14","n":"S111073","s":3283000.0,"q":3283000.0},{"c":"JOVOXIR AKA 8000","d":"2026-11-23","n":"S115222","s":795000.0,"q":795000.0},{"c":"MUZAFFAR AKA 1814 (USMON)","d":"2026-10-24","n":"S100846","s":1225926.0,"q":1225926.0},{"c":"NURILLO AKA 1351","d":"2026-11-22","n":"S114968","s":1840000.0,"q":1840000.0},{"c":"SAID (DIAS) (FAXRIYOR)","d":"2026-11-16","n":"S112208","s":218000.0,"q":218000.0},{"c":"SAIDAZIM  AKA 4572","d":"2026-11-23","n":"S114334","s":17035000.0,"q":17035000.0},{"c":"SAIDAZIM  AKA 4572","d":"2026-11-23","n":"S115439","s":5980000.0,"q":5980000.0},{"c":"SAIDAZIM  AKA 4572","d":"2026-11-23","n":"S115456","s":5158000.0,"q":5158000.0},{"c":"SAIDAZIM 3220","d":"2026-11-19","n":"S113624","s":320000.0,"q":320000.0},{"c":"SARDOR 8595","d":"2026-11-21","n":"S114531","s":214000.0,"q":48000.0},{"c":"SHOXSANAM","d":"2026-11-23","n":"S115377","s":422000.0,"q":298500.0},{"c":"SUXROB 9214","d":"2026-11-19","n":"S113442","s":3820500.0,"q":3820500.0}];const TODAY=new Date("2026-11-24");
 const fm=n=>Math.round(n).toLocaleString("ru-RU").replace(/ /g," ");
 const fd=s=>s.slice(8)+"."+s.slice(5,7)+"."+s.slice(0,4);
 const days=s=>Math.floor((TODAY-new Date(s))/864e5);
 let onlyOpen=true,onlyOver=false;const OPEN=new Set();
-document.getElementById("sub").textContent="Nabixo‘jayev Saidazim · Shiribom Chakana · holat: 23.11.2026 19:21";
+document.getElementById("sub").textContent="Nabixo‘jayev Saidazim · Shiribom Chakana · holat: 24.11.2026 00:18";
 function draw(){
  const t=document.getElementById("s").value.trim().toLowerCase();
  let rows=DATA.filter(r=>(!onlyOpen||r.q>0)&&(!onlyOver||(r.q>0&&days(r.d)>3))&&(!t||(r.c+" "+r.n).toLowerCase().includes(t)));
