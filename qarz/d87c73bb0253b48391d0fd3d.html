@@ -30,12 +30,12 @@ input[type=search]{flex:1 1 200px;min-width:0;padding:11px 12px;border:1px solid
 <div class="bar"><input type="search" id="s" placeholder="Mijoz yoki hujjat raqami..."><button class="ch" id="ta">Hammasini ochish</button></div>
 <div id="out"></div></div>
 <script>
-const DATA=[{"c":"SHIRIBOM CHAKANA","d":"2026-08-02","n":"S61164","s":24000.0,"q":1000.0},{"c":"SHIRIBOM CHAKANA","d":"2026-08-03","n":"S61316","s":579000.0,"q":1000.0},{"c":"SHIRIBOM CHAKANA","d":"2026-08-09","n":"S64461","s":72000.0,"q":2000.0},{"c":"SHIRIBOM CHAKANA","d":"2026-08-10","n":"S64900","s":52000.0,"q":2000.0},{"c":"SHIRIBOM CHAKANA","d":"2026-08-13","n":"S66273","s":31000.0,"q":1000.0},{"c":"SHIRIBOM CHAKANA","d":"2026-08-13","n":"S66307","s":15400.0,"q":400.0},{"c":"SHIRIBOM CHAKANA","d":"2026-08-14","n":"S66429","s":69000.0,"q":1000.0},{"c":"SHIRIBOM CHAKANA","d":"2026-08-14","n":"S66635","s":27500.0,"q":1500.0},{"c":"SHIRIBOM CHAKANA","d":"2026-08-16","n":"S67266","s":113000.0,"q":1000.0}];const TODAY=new Date("2026-11-10");
+const DATA=[{"c":"SARDOR TEST UCHUN","d":"2026-11-26","n":"S116904","s":100000.0,"q":100000.0},{"c":"SHIRIBOM CHAKANA","d":"2026-08-02","n":"S61164","s":24000.0,"q":1000.0},{"c":"SHIRIBOM CHAKANA","d":"2026-08-03","n":"S61316","s":579000.0,"q":1000.0},{"c":"SHIRIBOM CHAKANA","d":"2026-08-09","n":"S64461","s":72000.0,"q":2000.0},{"c":"SHIRIBOM CHAKANA","d":"2026-08-10","n":"S64900","s":52000.0,"q":2000.0},{"c":"SHIRIBOM CHAKANA","d":"2026-08-13","n":"S66273","s":31000.0,"q":1000.0},{"c":"SHIRIBOM CHAKANA","d":"2026-08-13","n":"S66307","s":15400.0,"q":400.0},{"c":"SHIRIBOM CHAKANA","d":"2026-08-14","n":"S66429","s":69000.0,"q":1000.0},{"c":"SHIRIBOM CHAKANA","d":"2026-08-14","n":"S66635","s":27500.0,"q":1500.0},{"c":"SHIRIBOM CHAKANA","d":"2026-08-16","n":"S67266","s":113000.0,"q":1000.0}];const TODAY=new Date("2026-11-27");
 const fm=n=>Math.round(n).toLocaleString("ru-RU").replace(/ /g," ");
 const fd=s=>s.slice(8)+"."+s.slice(5,7)+"."+s.slice(0,4);
 const days=s=>Math.floor((TODAY-new Date(s))/864e5);
 let onlyOpen=true,onlyOver=false;const OPEN=new Set();
-document.getElementById("sub").textContent="Odilov Saloxiddinxon · Shiribom Chakana · holat: 10.11.2026 18:12";
+document.getElementById("sub").textContent="Odilov Saloxiddinxon · Shiribom Chakana · holat: 27.11.2026 00:13";
 function draw(){
  const t=document.getElementById("s").value.trim().toLowerCase();
  let rows=DATA.filter(r=>(!onlyOpen||r.q>0)&&(!onlyOver||(r.q>0&&days(r.d)>3))&&(!t||(r.c+" "+r.n).toLowerCase().includes(t)));
